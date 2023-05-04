@@ -52,14 +52,16 @@ class FixedPortfolioPercentagePositionSizer(PositionSizer):
         self.fixed_percentage = fixed_percentage
         self.tolerance_percentage = tolerance_percentage
 
-    def _generate_market_orders(self, signals: List[Signal], time_in_force: TimeInForce, frequency: Frequency = None) \
-            -> List[Optional[Order]]:
+    def _generate_market_orders(self, signals: List[Signal], time_in_force: TimeInForce, frequency: Frequency = None) -> List[Optional[Order]]:
         target_percentages = {
             self._get_specific_ticker(signal.ticker): signal.suggested_exposure.value * self.fixed_percentage
             for signal in signals
         }
 
-        market_order_list = self._order_factory.target_percent_orders(
-            target_percentages, MarketOrder(), time_in_force, self.tolerance_percentage, frequency)
-
-        return market_order_list
+        return self._order_factory.target_percent_orders(
+            target_percentages,
+            MarketOrder(),
+            time_in_force,
+            self.tolerance_percentage,
+            frequency,
+        )

@@ -30,15 +30,14 @@ def main():
     data_provider = container.resolve(GeneralPriceProvider)
     prices_tms = data_provider.get_price(QuandlTicker('AAPL', 'WIKI'), PriceField.Close, start_date, end_date)
 
-    # add data to the chart and the legend
-    marker_props = {'alpha': 0.5}
-    stemline_props = {'linestyle': '-.', 'linewidth': 0.2}
     baseline_props = {'visible': False}
     color = 'red'
-    marker_props['markeredgecolor'] = color
-    marker_props['markerfacecolor'] = color
-    stemline_props['color'] = color
-
+    marker_props = {
+        'alpha': 0.5,
+        'markeredgecolor': color,
+        'markerfacecolor': color,
+    }
+    stemline_props = {'linestyle': '-.', 'linewidth': 0.2, 'color': color}
     data_elem = StemDecorator(
         prices_tms, marker_props=marker_props, stemline_props=stemline_props, baseline_props=baseline_props)
 

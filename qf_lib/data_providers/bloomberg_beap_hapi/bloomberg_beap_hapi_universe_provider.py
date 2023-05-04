@@ -85,7 +85,7 @@ class BloombergBeapHapiUniverseProvider:
         }
 
         self.logger.info('Universe component payload:\n:%s', pprint.pformat(universe_payload))
-        universe_url = urljoin(self.account_url, 'universes/{}/'.format(universe_id))
+        universe_url = urljoin(self.account_url, f'universes/{universe_id}/')
 
         # check if already exists, if not then post
         response = self.session.get(universe_url)

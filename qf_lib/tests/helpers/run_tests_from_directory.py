@@ -32,8 +32,7 @@ def run_tests_and_print_results(tests_directory, top_level_dir):
 
 def run_tests(tests_directory, top_level_dir):
     suite = unittest.TestLoader().discover(start_dir=tests_directory, top_level_dir=top_level_dir)
-    result = unittest.TextTestRunner(verbosity=1).run(suite)
-    return result
+    return unittest.TextTestRunner(verbosity=1).run(suite)
 
 
 def get_skipped_messages_info(result):
@@ -45,6 +44,4 @@ def get_skipped_messages_info(result):
         )
         skipped_info_list.append(skipped_test_info)
 
-    skipped_tests_messsage = "\n".join(skipped_info_list)
-
-    return skipped_tests_messsage
+    return "\n".join(skipped_info_list)

@@ -104,7 +104,7 @@ class TrendStrengthSheet:
         self.use_next_open_instead_of_close = use_next_open_instead_of_close
 
         suffix = "O-O" if use_next_open_instead_of_close else "O-C"
-        self.title = "{} {}".format(title, suffix)
+        self.title = f"{title} {suffix}"
 
         self.tickers = tickers
         self.document = Document(title)
@@ -115,9 +115,9 @@ class TrendStrengthSheet:
         for ticker in self.tickers:
             try:
                 self._add_page(ticker)
-                print("Finished evaluating trend strength of:  {}".format(ticker.as_string()))
+                print(f"Finished evaluating trend strength of:  {ticker.as_string()}")
             except Exception:
-                print("Error while processing {}".format(ticker.as_string()))
+                print(f"Error while processing {ticker.as_string()}")
 
         self._add_summary()
 
@@ -251,6 +251,6 @@ class TrendStrengthSheet:
         # Set the style for the report
         plt.style.use(['tearsheet'])
 
-        filename = "%Y_%m_%d-%H%M {}.pdf".format(self.title)
+        filename = f"%Y_%m_%d-%H%M {self.title}.pdf"
         filename = datetime.now().strftime(filename)
         self.pdf_exporter.generate([self.document], output_sub_dir, filename)

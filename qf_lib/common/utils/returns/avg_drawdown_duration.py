@@ -34,7 +34,4 @@ def avg_drawdown_duration(prices_tms: QFSeries) -> float:
     from qf_lib.common.utils.returns.list_of_max_drawdowns import list_of_max_drawdowns
     series_of_max_drawdowns, duration_of_drawdowns = list_of_max_drawdowns(prices_tms)
 
-    if len(duration_of_drawdowns) > 0:
-        return mean(duration_of_drawdowns)
-    else:
-        return 0.0
+    return mean(duration_of_drawdowns) if len(duration_of_drawdowns) > 0 else 0.0

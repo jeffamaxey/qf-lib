@@ -67,8 +67,11 @@ class FastAlphaModelTesterConfig:
         self.kwargs = kwargs
         self.tested_parameters_names, _ = convert_to_list(tested_params, str)
 
-        assert set(param for param in self.tested_parameters_names if param in self.kwargs.keys()) == set(
-            self.tested_parameters_names), "The tested_params need to be passed in the kwargs"
+        assert {
+            param for param in self.tested_parameters_names if param in self.kwargs
+        } == set(
+            self.tested_parameters_names
+        ), "The tested_params need to be passed in the kwargs"
 
     def generate_model(self, data_provider: DataProvider):
         return self.model_type(**self.kwargs, data_provider=data_provider)
@@ -144,8 +147,9 @@ class FastAlphaModelTester:
         # use Daily frequency for any other time frame
         self._data_frequency = Frequency.MIN_1 if self._frequency > Frequency.DAILY else Frequency.DAILY
 
-        assert len(set(config.model_type for config in alpha_model_configs)) == 1, \
-            "All passed FastAlphaModelTesterConfig should have the same alpha model type"
+        assert (
+            len({config.model_type for config in alpha_model_configs}) == 1
+        ), "All passed FastAlphaModelTesterConfig should have the same alpha model type"
         self._model_type = alpha_model_configs[0].model_type
 
         if self._frequency > Frequency.DAILY:
@@ -156,20 +160,25 @@ class FastAlphaModelTester:
             self._start_time["microsecond"] = 0
             self._end_time["second"] = 0
             self._end_time["microsecond"] = 0
-        else:
-            if self._start_time is not None or self._end_time is not None:
-                self.logger.warning("Start time and end time will be ignored for frequency lower than daily")
+        elif self._start_time is not None or self._end_time is not None:
+            self.logger.warning("Start time and end time will be ignored for frequency lower than daily")
 
     def test_alpha_models(self) -> BacktestSummary:
-        self.logger.info("{} parameters sets to be tested".format(len(self._alpha_model_configs)))
+        self.logger.info(
+            f"{len(self._alpha_model_configs)} parameters sets to be tested"
+        )
 
         prices_data_array = self._get_data_for_backtest()
         exposure_values_df_list = self._generate_exposures_for_all_params_sets()
         backtest_summary_elem_list = self._calculate_backtest_summary_elements(exposure_values_df_list,
                                                                                prices_data_array)
-        backtest_summary = BacktestSummary(self._tickers, self._model_type, backtest_summary_elem_list,
-                                           self._start_date, self._end_date)
-        return backtest_summary
+        return BacktestSummary(
+            self._tickers,
+            self._model_type,
+            backtest_summary_elem_list,
+            self._start_date,
+            self._end_date,
+        )
 
     def _get_valid_tickers(self, original_ticker: Sequence[Ticker]) -> List[Ticker]:
         tickers = []
@@ -180,7 +189,7 @@ class FastAlphaModelTester:
                     ticker = ticker.get_current_specific_ticker()
                 tickers.append(ticker)
             except NoValidTickerException:
-                self.logger.warning("No valid ticker for {}".format(ticker.name))
+                self.logger.warning(f"No valid ticker for {ticker.name}")
 
         return tickers
 
@@ -201,8 +210,9 @@ class FastAlphaModelTester:
                 tickers_dict[ticker] = self._data_provider.get_price(ticker, PriceField.ohlcv(), self._start_date,
                                                                      self._end_date, self._data_frequency)
 
-        prices_data_array = tickers_dict_to_data_array(tickers_dict, self._tickers, PriceField.ohlcv())
-        return prices_data_array
+        return tickers_dict_to_data_array(
+            tickers_dict, self._tickers, PriceField.ohlcv()
+        )
 
     def _generate_exposures_for_all_params_sets(self) -> List[QFDataFrame]:
         self.logger.info("\nGenerating exposures:")
@@ -228,20 +238,22 @@ class FastAlphaModelTester:
                       for config, exposure_values_df in zip(self._alpha_model_configs, exposure_values_df_list)
                       for tickers in tickers_for_summary]
 
-        backtest_summary_elem_list = Parallel(n_jobs=self._n_jobs)(
-            delayed(self._calculate_backtest_summary)(tickers, config, prices_data_array,
-                                                      open_to_open_returns_df[tickers],
-                                                      exposure_values_df[tickers])
+        return Parallel(n_jobs=self._n_jobs)(
+            delayed(self._calculate_backtest_summary)(
+                tickers,
+                config,
+                prices_data_array,
+                open_to_open_returns_df[tickers],
+                exposure_values_df[tickers],
+            )
             for config, exposure_values_df, tickers in all_params
         )
 
-        return backtest_summary_elem_list
-
     def _get_open_prices(self, prices_data_array: QFDataArray) -> PricesDataFrame:
         """ Returns PricesDataFrame consisting of only Open prices. """
-        open_prices_df = cast_data_array_to_proper_type(prices_data_array.loc[:, :, PriceField.Open],
-                                                        use_prices_types=True).dropna(how="all")
-        return open_prices_df
+        return cast_data_array_to_proper_type(
+            prices_data_array.loc[:, :, PriceField.Open], use_prices_types=True
+        ).dropna(how="all")
 
     def _calculate_backtest_summary(self, tickers: Union[Ticker, Sequence[Ticker]], config: FastAlphaModelTesterConfig,
                                     prices_data_array: QFDataArray,
@@ -252,9 +264,13 @@ class FastAlphaModelTester:
         trades = self._calculate_trades(prices_data_array, exposure_values_df)
         tickers, _ = convert_to_list(tickers, Ticker)
 
-        element = BacktestSummaryElement(config.model_parameters(), config.tested_parameters_names, portfolio_rets_tms,
-                                         trades, tickers)
-        return element
+        return BacktestSummaryElement(
+            config.model_parameters(),
+            config.tested_parameters_names,
+            portfolio_rets_tms,
+            trades,
+            tickers,
+        )
 
     def _calculate_portfolio_returns_tms(self, open_to_open_returns_df: QFDataFrame,
                                          exposure_values_df: QFDataFrame) \
@@ -332,8 +348,7 @@ class FastAlphaModelTester:
 
         return trade_data_list
 
-    def generate_trades_for_ticker(self, prices_array: QFDataArray, exposures_tms: pd.Series, ticker: Ticker) \
-            -> List[Trade]:
+    def generate_trades_for_ticker(self, prices_array: QFDataArray, exposures_tms: pd.Series, ticker: Ticker) -> List[Trade]:
 
         open_prices_tms = cast_data_array_to_proper_type(prices_array.loc[:, ticker, PriceField.Open],
                                                          use_prices_types=True)
@@ -363,8 +378,9 @@ class FastAlphaModelTester:
 
             # skipping the nan Open prices
             if np.isnan(curr_price):
-                self.logger.warning("Open price is None, cannot create trade on {} for {}".format(
-                    curr_date, str(ticker)))
+                self.logger.warning(
+                    f"Open price is None, cannot create trade on {curr_date} for {str(ticker)}"
+                )
                 continue
 
             out_of_the_market = trade_exposure is None
@@ -432,7 +448,7 @@ class FastAlphaModelTester:
 
         for i, curr_datetime in enumerate(backtest_dates.index):
             if i % 1000 == 0:
-                self.logger.info('{} / {} of Exposure dates processed'.format(i, len(backtest_dates)))
+                self.logger.info(f'{i} / {len(backtest_dates)} of Exposure dates processed')
 
             new_exposures = QFSeries(index=tickers)
             self._timer.set_current_time(curr_datetime)

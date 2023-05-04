@@ -75,8 +75,11 @@ def create_rolling_chart(
         legend.add_entry(rolling_element, tms.name)
 
     # Add title
-    chart.add_decorator(TitleDecorator(
-        "Rolling {} (window: {}, step: {}) ".format(func_name, window_size, step)))
+    chart.add_decorator(
+        TitleDecorator(
+            f"Rolling {func_name} (window: {window_size}, step: {step}) "
+        )
+    )
 
     # Add OOS line.
     new_oos_date = series_list[0].index.asof(pandas.to_datetime(oos_date))

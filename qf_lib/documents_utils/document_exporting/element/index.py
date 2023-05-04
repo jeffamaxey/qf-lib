@@ -38,13 +38,12 @@ class IndexElement(Element):
         document that this ``IndexElement`` was added to.
         """
 
-        # Filter out any non-heading elements as the template is not interested in anything else.
-        elems = []
-        for element in document.elements:
-            if isinstance(element, HeadingElement):
-                if element.level <= self.max_level:
-                    elems.append(element)
-
+        elems = [
+            element
+            for element in document.elements
+            if isinstance(element, HeadingElement)
+            and element.level <= self.max_level
+        ]
         # Generate the HTML.
         env = templates.environment
 

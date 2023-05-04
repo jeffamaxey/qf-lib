@@ -46,8 +46,7 @@ class AlphaModel(metaclass=ABCMeta):
         self.data_provider = data_provider
         self.logger = qf_logger.getChild(self.__class__.__name__)
 
-    def get_signal(self, ticker: Ticker, current_exposure: Exposure, current_time: datetime, frequency: Frequency) \
-            -> Signal:
+    def get_signal(self, ticker: Ticker, current_exposure: Exposure, current_time: datetime, frequency: Frequency) -> Signal:
         """
         Returns the Signal calculated for a specific AlphaModel and a set of data for a specified Ticker
 
@@ -73,9 +72,14 @@ class AlphaModel(metaclass=ABCMeta):
         fraction_at_risk = self.calculate_fraction_at_risk(ticker, current_time, frequency)
         last_available_price = self.data_provider.get_last_available_price(ticker, frequency, current_time)
 
-        signal = Signal(ticker, suggested_exposure, fraction_at_risk, last_available_price, current_time,
-                        alpha_model=self)
-        return signal
+        return Signal(
+            ticker,
+            suggested_exposure,
+            fraction_at_risk,
+            last_available_price,
+            current_time,
+            alpha_model=self,
+        )
 
     @abstractmethod
     def calculate_exposure(self, ticker: Ticker, current_exposure: Exposure, current_time: datetime,
@@ -152,8 +156,10 @@ class AlphaModel(metaclass=ABCMeta):
         fields = [PriceField.High, PriceField.Low, PriceField.Close]
         try:
             prices_df = self.data_provider.historical_price(ticker, fields, num_of_bars_needed, current_time, frequency)
-            fraction_at_risk = average_true_range(prices_df, normalized=True) * self.risk_estimation_factor
-            return fraction_at_risk
+            return (
+                average_true_range(prices_df, normalized=True)
+                * self.risk_estimation_factor
+            )
         except ValueError:
             self.logger.error(f"Could not calculate the fraction_at_risk for the ticker {ticker.name}", exc_info=True)
             return nan

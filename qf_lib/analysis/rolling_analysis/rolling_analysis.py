@@ -22,7 +22,7 @@ class RollingAnalysisFactory:
         """
         Calculates the rolling table for provided timeseries
         """
-        rows = list()
+        rows = []
         windows = [(6 * 21, "6 Months"), (252, "1 Year"),
                    (252 * 2, "2 Years"), (252 * 5, "5 Years")]
 

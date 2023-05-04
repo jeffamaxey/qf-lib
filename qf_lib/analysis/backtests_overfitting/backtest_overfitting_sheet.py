@@ -259,8 +259,12 @@ class BacktestOverfittingSheet(AbstractDocument):
 
     def _add_probability_of_backtest_overiftting_analysis(self):
         """ Computes the PBO and other necessary measures to asses the probability of the backtests overfitting. """
-        self.document.add_element(HeadingElement(level=2, text="Probability of Backtest Overfitting ({} slices)"
-                                                 .format(self.num_of_slices)))
+        self.document.add_element(
+            HeadingElement(
+                level=2,
+                text=f"Probability of Backtest Overfitting ({self.num_of_slices} slices)",
+            )
+        )
         self.document.add_element(ParagraphElement("\n"))
 
         self.document.add_element(ParagraphElement("The concept of the Probability of Backtest Overfitting is "
@@ -325,7 +329,11 @@ class BacktestOverfittingSheet(AbstractDocument):
 
             chart = LineChart()
             chart.add_decorator(ScatterDecorator(x_data=df["IS"], y_data=df["OOS"], size=10))
-            chart.add_decorator(TitleDecorator("IS vs OOS comparison - {}".format(function_name), key="title"))
+            chart.add_decorator(
+                TitleDecorator(
+                    f"IS vs OOS comparison - {function_name}", key="title"
+                )
+            )
             chart.add_decorator(
                 AxesLabelDecorator(x_label="In-Sample performance", y_label="Out-Of-Sample performance"))
             grid.add_chart(chart)
@@ -345,12 +353,19 @@ class BacktestOverfittingSheet(AbstractDocument):
             grid.add_chart(self._get_is_oos_fit_chart(oa, top_strategies_to_plot=4))
 
             is_hist = HistogramChart(df["IS"], best_fit=True, bins=20)
-            is_hist.add_decorator(TitleDecorator(title="In-Sample {} histogram".format(function_name), key="title"))
+            is_hist.add_decorator(
+                TitleDecorator(
+                    title=f"In-Sample {function_name} histogram", key="title"
+                )
+            )
             grid.add_chart(is_hist)
 
             oos_hist = HistogramChart(df["OOS"], best_fit=True, bins=20)
             oos_hist.add_decorator(
-                TitleDecorator(title="Out-Of-Sample {} histogram".format(function_name), key="title"))
+                TitleDecorator(
+                    title=f"Out-Of-Sample {function_name} histogram", key="title"
+                )
+            )
             grid.add_chart(oos_hist)
 
             self.document.add_element(grid)
@@ -383,8 +398,11 @@ class BacktestOverfittingSheet(AbstractDocument):
         for function_name, oa in self.overfitting_analysis.items():
             logits = oa.calculate_relative_rank_logits(oa.best_is_strategies_names)
             logits_histogram = HistogramChart(logits.values, best_fit=True)
-            logits_histogram.add_decorator(TitleDecorator(title="Logits distribution - {}".format(function_name),
-                                                          key="title"))
+            logits_histogram.add_decorator(
+                TitleDecorator(
+                    title=f"Logits distribution - {function_name}", key="title"
+                )
+            )
             logits_histogram.add_decorator(AxesLabelDecorator(x_label="Logit value", y_label="Frequency"))
             grid.add_chart(logits_histogram)
 
@@ -448,7 +466,7 @@ class BacktestOverfittingSheet(AbstractDocument):
             legend.add_entry(data, "Non-optimised")
 
             chart.add_decorator(legend)
-            chart.add_decorator(TitleDecorator("Stochastic dominance - {}".format(function_name)))
+            chart.add_decorator(TitleDecorator(f"Stochastic dominance - {function_name}"))
             grid.add_chart(chart)
 
         self.document.add_element(grid)
@@ -465,8 +483,8 @@ class BacktestOverfittingSheet(AbstractDocument):
         def func(x, a, b, c):
             return a * np.exp(-b * x) + c
 
-        min_is_performance = min([i["quality"].min() for i in oa.is_ranking])
-        max_is_performance = max([i["quality"].max() for i in oa.is_ranking])
+        min_is_performance = min(i["quality"].min() for i in oa.is_ranking)
+        max_is_performance = max(i["quality"].max() for i in oa.is_ranking)
         x_range = np.linspace(min_is_performance, max_is_performance, 1000)
 
         for ind, strategy in enumerate(top_strategies_names):
@@ -493,6 +511,6 @@ class BacktestOverfittingSheet(AbstractDocument):
         # Set the style for the report
         plt.style.use(['tearsheet'])
 
-        filename = "%Y_%m_%d-%H%M {}.pdf".format(self.title)
+        filename = f"%Y_%m_%d-%H%M {self.title}.pdf"
         filename = datetime.now().strftime(filename)
         return self.pdf_exporter.generate([self.document], report_dir, filename)

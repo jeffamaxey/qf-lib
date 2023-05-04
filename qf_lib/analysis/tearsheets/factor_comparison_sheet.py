@@ -73,7 +73,7 @@ class FactorComparisonSheet(AbstractDocument):
         start_date = end_date - RelativeDelta(years=1)
 
         all_series_one_year = [self.benchmark_series.loc[start_date:]] + \
-                              [series.loc[start_date:] for series in self.factors_series]
+                                  [series.loc[start_date:] for series in self.factors_series]
 
         self._add_perf_chart_for_factor(series_list=all_series_one_year,
                                         title="Factors - 1 Year")
@@ -98,17 +98,22 @@ class FactorComparisonSheet(AbstractDocument):
         for series in self.factors_series:
             self.document.add_element(NewPageElement())
             self._add_header()
-            self._add_perf_chart_for_factor(series_list=[self.benchmark_series.loc[start_date:],
-                                                         series.loc[start_date:]
-                                                         ],
-                                            title="{} - 1 Year".format(series.name))
+            self._add_perf_chart_for_factor(
+                series_list=[
+                    self.benchmark_series.loc[start_date:],
+                    series.loc[start_date:],
+                ],
+                title=f"{series.name} - 1 Year",
+            )
             self._add_relative_performance_chart(
                 series.loc[start_date:], self.benchmark_series.loc[start_date:],
                 chart_title="Relative Performance", legend_subtitle="Factor - Benchmark")
 
-            self._add_perf_chart_for_factor(series_list=[self.benchmark_series, series],
-                                            title="{} - Full History".format(series.name),
-                                            force_log_scale=True)
+            self._add_perf_chart_for_factor(
+                series_list=[self.benchmark_series, series],
+                title=f"{series.name} - Full History",
+                force_log_scale=True,
+            )
             self.document.add_element(ParagraphElement("\n"))
             self._add_relative_performance_chart(
                 series, self.benchmark_series,
@@ -124,11 +129,11 @@ class FactorComparisonSheet(AbstractDocument):
 
         plt.rcParams['axes.prop_cycle'] = cycler(color=hex_colors)
 
-        file_name = "%Y_%m_%d-%H%M {}.pdf".format(self.title)
+        file_name = f"%Y_%m_%d-%H%M {self.title}.pdf"
         file_name = datetime.now().strftime(file_name)
 
         if not file_name.endswith(".pdf"):
-            file_name = "{}.pdf".format(file_name)
+            file_name = f"{file_name}.pdf"
 
         return self.pdf_exporter.generate([self.document], report_dir, file_name)
 

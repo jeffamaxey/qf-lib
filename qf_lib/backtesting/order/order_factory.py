@@ -119,7 +119,7 @@ class OrderFactory:
         self._check_tickers_type(list(tolerance_quantities.keys()))
 
         # Dict of Ticker -> Quantities of shares to buy/sell
-        quantities = dict()
+        quantities = {}
         ticker_to_position_quantity = {p.ticker(): p.quantity() for p in self.broker.get_positions()}
 
         for ticker, target_quantity in target_quantities.items():
@@ -307,10 +307,10 @@ class OrderFactory:
         current_prices = self.data_provider.get_last_available_price(tickers, frequency)
 
         # Ticker -> target number of shares
-        target_quantities = dict()  # type: Dict[Ticker, float]
+        target_quantities = {}
 
         # Ticker -> tolerance expressed as number of shares
-        tolerance_quantities = dict()  # type: Dict[Ticker, float]
+        tolerance_quantities = {}
 
         for ticker, amount_of_money in ticker_to_amount_of_money.items():
             current_price = current_prices.loc[ticker]
@@ -329,17 +329,18 @@ class OrderFactory:
             del params_dict['self']
 
         fn_name_level_above = get_function_name(1)
-        log_message = "Function call: '{}' with parameters:".format(fn_name_level_above)
+        log_message = f"Function call: '{fn_name_level_above}' with parameters:"
 
         for key, value in params_dict.items():
             if isinstance(value, dict) and value:
-                value_str = ""
-                for inner_k, inner_v in value.items():
-                    value_str += "\n\t\t{}: {}".format(inner_k, inner_v)
+                value_str = "".join(
+                    f"\n\t\t{inner_k}: {inner_v}"
+                    for inner_k, inner_v in value.items()
+                )
             else:
                 value_str = str(value)
 
-            log_message += "\n\t{}: {}".format(key, value_str)
+            log_message += f"\n\t{key}: {value_str}"
 
         self.logger.debug(log_message)
 

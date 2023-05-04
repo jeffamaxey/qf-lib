@@ -33,8 +33,7 @@ from qf_lib.containers.series.qf_series import QFSeries
 
 
 def normalize_data_array(
-        data_array, tickers, fields, got_single_date, got_single_ticker, got_single_field, use_prices_types=False) \
-        -> Union[QFSeries, QFDataFrame, QFDataArray, PricesSeries, PricesDataFrame]:
+        data_array, tickers, fields, got_single_date, got_single_ticker, got_single_field, use_prices_types=False) -> Union[QFSeries, QFDataFrame, QFDataArray, PricesSeries, PricesDataFrame]:
     """
     Post-processes the result of some DataProviders so that it satisfies the format of a result expected
     from DataProviders. Expected format rules should cover the following:
@@ -71,12 +70,13 @@ def normalize_data_array(
         data_array = data_array.reindex(fields=fields)
 
     data_array = data_array.dropna(DATES, how='all')
-    squeezed_and_casted_result = squeeze_data_array_and_cast_to_proper_type(data_array, got_single_date,
-                                                                            got_single_ticker,
-                                                                            got_single_field,
-                                                                            use_prices_types)
-
-    return squeezed_and_casted_result
+    return squeeze_data_array_and_cast_to_proper_type(
+        data_array,
+        got_single_date,
+        got_single_ticker,
+        got_single_field,
+        use_prices_types,
+    )
 
 
 def squeeze_data_array_and_cast_to_proper_type(original_data_array: QFDataArray, got_single_date: bool,
@@ -160,13 +160,11 @@ def cast_data_array_to_proper_type(result: QFDataArray, use_prices_types=False):
 def cast_dataframe_to_proper_type(result):
     num_of_dimensions = len(result.axes)
     if num_of_dimensions == 1:
-        casted_result = cast_series(result, QFSeries)
+        return cast_series(result, QFSeries)
     elif num_of_dimensions == 2:
-        casted_result = cast_dataframe(result, QFDataFrame)
+        return cast_dataframe(result, QFDataFrame)
     else:
-        casted_result = result
-
-    return casted_result
+        return result
 
 
 def tickers_dict_to_data_array(tickers_data_dict: Dict[Ticker, QFDataFrame],
@@ -190,8 +188,12 @@ def tickers_dict_to_data_array(tickers_data_dict: Dict[Ticker, QFDataFrame],
     """
     # return empty xr.DataArray if there is no data to be converted
     requested_tickers, _ = convert_to_list(requested_tickers, Ticker)
-    requested_fields, _ = convert_to_list(requested_fields,
-                                          type(requested_fields) if not isinstance(requested_fields, Sequence) else str)
+    requested_fields, _ = convert_to_list(
+        requested_fields,
+        str
+        if isinstance(requested_fields, Sequence)
+        else type(requested_fields),
+    )
 
     if not tickers_data_dict:
         return QFDataArray.create(dates=[], tickers=requested_tickers, fields=requested_fields)
@@ -229,8 +231,7 @@ def get_fields_from_tickers_data_dict(tickers_data_dict):
     for dates_fields_df in tickers_data_dict.values():
         fields.update(dates_fields_df.columns.values)
 
-    fields = list(fields)
-    return fields
+    return list(fields)
 
 
 def chain_tickers_within_range(future_ticker: FutureTicker, exp_dates: QFDataFrame, start_date: datetime,

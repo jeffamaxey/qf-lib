@@ -171,19 +171,26 @@ class AssetPerfAndDrawdownSheet(AbstractDocument):
             strategy_returns.name = "Strategy"
 
             if len(strategy_returns) > 0:
-                perf_chart = self._get_perf_chart([buy_and_hold_returns, strategy_returns], False,
-                                                  "Performance - {}".format(ticker.name))
+                perf_chart = self._get_perf_chart(
+                    [buy_and_hold_returns, strategy_returns],
+                    False,
+                    f"Performance - {ticker.name}",
+                )
 
-                underwater_chart = self._get_underwater_chart(strategy_returns.to_prices(),
-                                                              title="Drawdown - {}".format(ticker.name),
-                                                              benchmark_series=buy_and_hold_returns.to_prices(),
-                                                              rotate_x_axis=True)
+                underwater_chart = self._get_underwater_chart(
+                    strategy_returns.to_prices(),
+                    title=f"Drawdown - {ticker.name}",
+                    benchmark_series=buy_and_hold_returns.to_prices(),
+                    rotate_x_axis=True,
+                )
 
                 grid.add_chart(perf_chart)
                 grid.add_chart(underwater_chart)
                 self.document.add_element(grid)
             else:
-                self._logger.warning("No data is available for {}. No plots will be generated.".format(ticker.name))
+                self._logger.warning(
+                    f"No data is available for {ticker.name}. No plots will be generated."
+                )
 
     def _generate_buy_and_hold_returns(self, ticker: Ticker) -> SimpleReturnsSeries:
         """ Computes series of simple returns, which would be returned by the Buy and Hold strategy. """
@@ -205,7 +212,7 @@ class AssetPerfAndDrawdownSheet(AbstractDocument):
         # For each ticker compute the PnL for each period (each year, month etc)
         pnl_df = QFDataFrame.from_dict(ticker_to_pnl)
         agg_performance = pnl_df.groupby(pd.Grouper(key=pnl_df.index.name, freq=self._frequency.to_pandas_freq())) \
-            .apply(lambda s: s.iloc[-1] - s.iloc[0])
+                .apply(lambda s: s.iloc[-1] - s.iloc[0])
 
         # Format the column labels, so that they point exactly to the considered time frame
         column_labels_format = {
@@ -231,8 +238,12 @@ class AssetPerfAndDrawdownSheet(AbstractDocument):
         self.document.add_element(ParagraphElement("\n"))
 
         for table in performance_tables:
-            self.document.add_element(HeadingElement(level=3, text="Performance between: {} - {}".format(
-                table.model.data.columns[1], table.model.data.columns[-1])))
+            self.document.add_element(
+                HeadingElement(
+                    level=3,
+                    text=f"Performance between: {table.model.data.columns[1]} - {table.model.data.columns[-1]}",
+                )
+            )
             self.document.add_element(table)
             self.document.add_element(ParagraphElement("\n"))
 
@@ -241,8 +252,12 @@ class AssetPerfAndDrawdownSheet(AbstractDocument):
         # Add performance contribution table
         self.document.add_element(HeadingElement(level=2, text="Performance contribution"))
         for table in performance_contribution_tables:
-            self.document.add_element(HeadingElement(level=3, text="Performance contribution between {} - {}".format(
-                table.model.data.columns[1], table.model.data.columns[-1])))
+            self.document.add_element(
+                HeadingElement(
+                    level=3,
+                    text=f"Performance contribution between {table.model.data.columns[1]} - {table.model.data.columns[-1]}",
+                )
+            )
             self.document.add_element(table)
 
     def _create_performance_tables(self, performance_df: QFDataFrame) -> List[DFTable]:
@@ -255,9 +270,18 @@ class AssetPerfAndDrawdownSheet(AbstractDocument):
         # self.max_col_per_page columns, but keep the first column of the original df in all of them
         split_dfs = np.array_split(performance_df, np.ceil(performance_df.num_of_columns / self._max_columns_per_page),
                                    axis=1)
-        df_tables = [DFTable(df.reset_index(), css_classes=['table', 'shrink-font', 'right-align', 'wide-first-column'])
-                     for df in split_dfs]
-        return df_tables
+        return [
+            DFTable(
+                df.reset_index(),
+                css_classes=[
+                    'table',
+                    'shrink-font',
+                    'right-align',
+                    'wide-first-column',
+                ],
+            )
+            for df in split_dfs
+        ]
 
     def _create_performance_contribution_tables(self, performance_df: QFDataFrame) -> List[DFTable]:
         """
@@ -308,7 +332,7 @@ class AssetPerfAndDrawdownSheet(AbstractDocument):
     def save(self, report_dir: str = ""):
         # Set the style for the report
         plt.style.use(['tearsheet'])
-        filename = "%Y_%m_%d-%H%M {}.pdf".format(self.title)
+        filename = f"%Y_%m_%d-%H%M {self.title}.pdf"
         filename = datetime.now().strftime(filename)
 
         return self.pdf_exporter.generate([self.document], report_dir, filename)

@@ -134,6 +134,6 @@ class Slippage(metaclass=ABCMeta):
         for ticker, orders_group in groupby(sorted_orders, lambda order: order.ticker):
             orders_list = list(orders_group)
             if len(orders_list) > 1:
-                self._logger.warning("{} More than one order for ticker {}:".format(date, ticker))
+                self._logger.warning(f"{date} More than one order for ticker {ticker}:")
                 for order in orders_list:
                     self._logger.warning(order)

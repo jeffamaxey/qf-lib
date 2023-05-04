@@ -153,20 +153,17 @@ class AbstractPriceDataProvider(DataProvider, metaclass=ABCMeta):
         Inverse of str_to_expiration_date_field_map.
         """
         field_str_dict = self.expiration_date_field_str_map(ticker)
-        inv_dict = {v: k for k, v in field_str_dict.items()}
-        return inv_dict
+        return {v: k for k, v in field_str_dict.items()}
 
     def str_to_price_field_map(self, ticker: Ticker = None) -> Dict[str, PriceField]:
         """
         Inverse of price_field_to_str_map.
         """
         field_str_dict = self.price_field_to_str_map(ticker)
-        inv_dict = {v: k for k, v in field_str_dict.items()}
-        return inv_dict
+        return {v: k for k, v in field_str_dict.items()}
 
     def _map_field_to_str(
-            self, tickers: Union[Ticker, Sequence[Ticker]], fields: Union[None, PriceField, Sequence[PriceField]]) \
-            -> Union[None, str, Sequence[str]]:
+            self, tickers: Union[Ticker, Sequence[Ticker]], fields: Union[None, PriceField, Sequence[PriceField]]) -> Union[None, str, Sequence[str]]:
         """
         The method maps enum to sting that is recognised by the specific database.
 
@@ -193,16 +190,18 @@ class AbstractPriceDataProvider(DataProvider, metaclass=ABCMeta):
             if fields in field_str_dict:
                 return field_str_dict[fields]
             else:
-                raise LookupError("Field {} is not recognised by the data provider. Available Fields: {}"
-                                  .format(fields, list(field_str_dict.keys())))
+                raise LookupError(
+                    f"Field {fields} is not recognised by the data provider. Available Fields: {list(field_str_dict.keys())}"
+                )
 
         result = []
         for field in fields:
             if field in field_str_dict:
                 result.append(field_str_dict[field])
             else:
-                raise LookupError("Field {} is not recognised by the data provider. Available Fields: {}"
-                                  .format(fields, list(field_str_dict.keys())))
+                raise LookupError(
+                    f"Field {fields} is not recognised by the data provider. Available Fields: {list(field_str_dict.keys())}"
+                )
         return result
 
     @staticmethod
@@ -211,14 +210,7 @@ class AbstractPriceDataProvider(DataProvider, metaclass=ABCMeta):
 
     @staticmethod
     def _is_single_ticker(value):
-        if isinstance(value, Ticker):
-            return True
-
-        return False
+        return isinstance(value, Ticker)
 
     def _get_first_ticker(self, tickers):
-        if self._is_single_ticker(tickers):
-            ticker = tickers
-        else:
-            ticker = tickers[0]
-        return ticker
+        return tickers if self._is_single_ticker(tickers) else tickers[0]

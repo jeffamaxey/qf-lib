@@ -50,7 +50,7 @@ class RollingWindowsEstimator:
             window_size = 30
         elif 300 <= num_of_samples < 500:
             window_size = 75
-        elif 500 <= num_of_samples:
+        elif num_of_samples >= 500:
             window_size = 125
         else:
             raise ValueError("Too few samples to estimate a rolling window's size.")
@@ -80,7 +80,7 @@ class RollingWindowsEstimator:
             step = 10
         elif 500 <= num_of_samples < 1500:
             step = 20
-        elif 1500 <= num_of_samples:
+        elif num_of_samples >= 1500:
             step = 50
         else:
             raise ValueError("Too few samples to estimate a rolling window's size.")

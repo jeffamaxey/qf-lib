@@ -72,11 +72,8 @@ class PeriodicEvent(TimeEvent, metaclass=ABCMeta):
     @classmethod
     def set_start_and_end_time(cls, start_time: Dict[str, int], end_time: Dict[str, int]):
         zeroed_seconds_dict = {"second": 0, "microsecond": 0}
-        cls.start_time = start_time.copy()
-        cls.start_time.update(zeroed_seconds_dict)
-
-        cls.end_time = end_time.copy()
-        cls.end_time.update(zeroed_seconds_dict)
+        cls.start_time = start_time | zeroed_seconds_dict
+        cls.end_time = end_time | zeroed_seconds_dict
 
     @classmethod
     def set_frequency(cls, frequency: Frequency):
@@ -93,9 +90,12 @@ class PeriodicEvent(TimeEvent, metaclass=ABCMeta):
         # Generate the list of time dictionaries
         _trigger_time_list = self._frequency_to_trigger_time()
 
-        for _trigger_time in _trigger_time_list:
-            # Define a custom regular time event
-            self._events_list.append(self._PeriodicRegularEvent(_trigger_time, self.start_time, self.end_time))
+        self._events_list.extend(
+            self._PeriodicRegularEvent(
+                _trigger_time, self.start_time, self.end_time
+            )
+            for _trigger_time in _trigger_time_list
+        )
 
     class _PeriodicRegularEvent(RegularTimeEvent):
 

@@ -65,7 +65,7 @@ class Settings:
         elif isinstance(merged_config, (list, tuple)) and isinstance(config, (list, tuple)):
             merged_config += config
         else:
-            raise ValueError("Cannot merge values: {} and {}".format(merged_config, config))
+            raise ValueError(f"Cannot merge values: {merged_config} and {config}")
 
         return merged_config
 
@@ -77,7 +77,4 @@ class Settings:
                 merged_dict[key] = self._merge(merged_dict[key], value)
 
     def __str__(self):
-        return "Settings: \n" \
-               "\t settings path: {}\n" \
-               "\t secret path: {}\n" \
-               "\t init properties: {}".format(self.settings_path, self.secret_path, self.init_properties)
+        return f"Settings: \n\t settings path: {self.settings_path}\n\t secret path: {self.secret_path}\n\t init properties: {self.init_properties}"

@@ -27,7 +27,7 @@ def main():
 
     xlx_exporter.write_cell(absolute_path, "D9", "Some random title")
 
-    print("Saved data to {}".format(absolute_path))
+    print(f"Saved data to {absolute_path}")
 
 
 if __name__ == '__main__':

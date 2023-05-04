@@ -41,8 +41,16 @@ class TestPeriodsList(TestCase):
         assert_lists_equal(expected_periods_list, actual_periods_list)
 
         for start_date, end_date in actual_periods_list:
-            self.assertEqual(datetime, type(start_date), "Error while checking start_date: {}".format(str(start_date)))
-            self.assertEqual(datetime, type(end_date), "Error while checking end_date: {}".format(str(end_date)))
+            self.assertEqual(
+                datetime,
+                type(start_date),
+                f"Error while checking start_date: {str(start_date)}",
+            )
+            self.assertEqual(
+                datetime,
+                type(end_date),
+                f"Error while checking end_date: {str(end_date)}",
+            )
 
 
 if __name__ == '__main__':

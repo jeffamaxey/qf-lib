@@ -142,10 +142,7 @@ class Table(Element):
         assert isinstance(self._column_cells, list)
         assert len(values) == len(self._column_cells)
 
-        formatted_values = []
-        # Format each of the values.
-        for value in values:
-            formatted_values.append(self._create_cell(value, css_class))
+        formatted_values = [self._create_cell(value, css_class) for value in values]
         self.rows.append(formatted_values)
 
     def insert_column(self, header: Union[str, ColumnCell], cells: List[Any], location: int, css_class: str = "") -> None:
@@ -195,22 +192,21 @@ class Table(Element):
 
         new_cols = [self._column_cells[0]]  # The first column is kept the same.
         # Copy the columns.
-        for i in range(1, len(self._column_cells)):
-            new_cols.append(self._column_cells[i])
-        for i in range(1, len(table._column_cells)):
-            new_cols.append(table._column_cells[i])
-
+        new_cols.extend(
+            self._column_cells[i] for i in range(1, len(self._column_cells))
+        )
+        new_cols.extend(
+            table._column_cells[i] for i in range(1, len(table._column_cells))
+        )
         # Copy the rows.
         new_rows = []
         for i in range(0, len(self.rows)):
             assert self.rows[i][0].value == table.rows[i][0].value, "The data in the first column must match."
             new_row = [self.rows[i][0]]  # The first column in each row is kept the same.
             # Copy each column from this table's row.
-            for j in range(1, len(self._column_cells)):
-                new_row.append(self.rows[i][j])
+            new_row.extend(self.rows[i][j] for j in range(1, len(self._column_cells)))
             # Copy each column from the other table's row.
-            for j in range(1, len(table._column_cells)):
-                new_row.append(table.rows[i][j])
+            new_row.extend(table.rows[i][j] for j in range(1, len(table._column_cells)))
             new_rows.append(new_row)
 
         result = Table(new_cols, css_class=self._css_class)
@@ -223,8 +219,9 @@ class Table(Element):
         calculated difference in a new column.
         """
         assert isinstance(self._column_cells, list)
-        self._column_cells.append("Diff ({}-{})".format(self._column_cells[col_index1],
-                                                        self._column_cells[col_index2]))
+        self._column_cells.append(
+            f"Diff ({self._column_cells[col_index1]}-{self._column_cells[col_index2]})"
+        )
 
         for row in self.rows:
             format_string = row[col_index1].format_string.replace("%", " pp")
@@ -266,14 +263,14 @@ class Table(Element):
         result = ""
         for key, value in self.html_data.items():
             assert '"' not in key
-            result += 'data-{}="{}" '.format(key, escape(value))
+            result += f'data-{key}="{escape(value)}" '
         return result
 
     def _create_cell(self, value: Any, css_class: str) -> Cell:
-        if isinstance(value, float) or isinstance(value, int):
-            return self.Cell(float(value), "{:7.2f}", "monospaced " + css_class)
+        if isinstance(value, (float, int)):
+            return self.Cell(float(value), "{:7.2f}", f"monospaced {css_class}")
         elif isinstance(value, self.Cell):
-            value.css_class += " " + css_class
+            value.css_class += f" {css_class}"
             return value
         else:
             return self.Cell(value, "{}", css_class)

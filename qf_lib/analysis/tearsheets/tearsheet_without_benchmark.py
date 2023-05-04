@@ -92,10 +92,14 @@ class TearsheetWithoutBenchmark(AbstractTearsheet):
     def _add_returns_statistics_charts(self, series):
         grid = self._get_new_grid()
         # Monthly returns heatmap
-        heatmap_chart = ReturnsHeatmapChart(series, title="Monthly Returns - {}".format(series.name))
+        heatmap_chart = ReturnsHeatmapChart(
+            series, title=f"Monthly Returns - {series.name}"
+        )
         grid.add_chart(heatmap_chart)
 
         # Annual returns bar chart
-        annual_ret_chart = create_returns_bar_chart(series, title="Annual Returns - {}".format(series.name))
+        annual_ret_chart = create_returns_bar_chart(
+            series, title=f"Annual Returns - {series.name}"
+        )
         grid.add_chart(annual_ret_chart)
         self.document.add_element(grid)

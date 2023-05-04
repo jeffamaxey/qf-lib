@@ -210,13 +210,11 @@ class QFDataFrame(pd.DataFrame, TimeIndexedContainer):
         return series
 
     def _prepare_value_per_column_list(self, values):
-        if isinstance(values, Sized):
-            self._assert_is_valid_values_list(values)
-            result_values = values
-        else:
-            result_values = [values] * self.num_of_columns
+        if not isinstance(values, Sized):
+            return [values] * self.num_of_columns
 
-        return result_values
+        self._assert_is_valid_values_list(values)
+        return values
 
     def _get_iterator_for_pandas(self, result_values):
         """
@@ -279,8 +277,7 @@ class QFDataFrame(pd.DataFrame, TimeIndexedContainer):
         return result
 
     def rolling_time_window(
-            self, window_length: int, step: int, func: Callable[[Union["QFDataFrame", np.ndarray]], "QFSeries"]) \
-            -> Union[None, "QFSeries", "QFDataFrame"]:
+            self, window_length: int, step: int, func: Callable[[Union["QFDataFrame", np.ndarray]], "QFSeries"]) -> Union[None, "QFSeries", "QFDataFrame"]:
         """
         Runs a given function on each rolling window in the dataframe. The content of a rolling window is also
         a QFDataFrame thus the funciton which should be applied should accept a QFDataFrame as an argument.
@@ -307,7 +304,7 @@ class QFDataFrame(pd.DataFrame, TimeIndexedContainer):
             None (if the result of running the rolling window was empty) or QFSeries (if the function applied returned
             scalar value for each window) or QFDataFrame (if the function applied returned QFSeries for each window)
         """
-        results_dict = dict()  # type: Dict[datetime, pd.Series]
+        results_dict = {}
         end_idx = self.num_of_rows
 
         while True:
@@ -331,7 +328,7 @@ class QFDataFrame(pd.DataFrame, TimeIndexedContainer):
             result = cast_dataframe(result, QFDataFrame)
         else:
             from qf_lib.containers.series.qf_series import QFSeries
-            dates_and_values = [(date, value) for date, value in results_dict.items()]
+            dates_and_values = list(results_dict.items())
             dates, values = zip(*dates_and_values)
             result = QFSeries(index=dates, data=values)
 

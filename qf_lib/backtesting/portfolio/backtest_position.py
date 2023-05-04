@@ -59,9 +59,7 @@ class BacktestPosition(Position, metaclass=ABCMeta):
 
     @property
     def current_price(self) -> float:
-        if self._current_price is None:
-            return 0.0
-        return self._current_price
+        return 0.0 if self._current_price is None else self._current_price
 
     @property
     def unrealised_pnl(self) -> float:
@@ -72,8 +70,9 @@ class BacktestPosition(Position, metaclass=ABCMeta):
         if self._current_price is None:
             return 0.0
 
-        profit_loss = self._compute_profit_and_loss_fraction(self.current_price, - self.quantity())
-        return profit_loss
+        return self._compute_profit_and_loss_fraction(
+            self.current_price, -self.quantity()
+        )
 
     @property
     def total_pnl(self):

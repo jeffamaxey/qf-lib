@@ -40,17 +40,18 @@ class FutureContract:
         self.data = data
 
     def __str__(self):
-        return 'Contract: ticker: {}, expiration date: {}'.format(
-            self.ticker, self.exp_date)
+        return f'Contract: ticker: {self.ticker}, expiration date: {self.exp_date}'
 
     def __eq__(self, other):
         if self is other:
             return True
 
-        if not isinstance(other, FutureContract):
-            return False
-
-        return (self.ticker, self.exp_date, self.data) == (other.ticker, other.exp_date, other.data)
+        return (
+            (self.ticker, self.exp_date, self.data)
+            == (other.ticker, other.exp_date, other.data)
+            if isinstance(other, FutureContract)
+            else False
+        )
 
     def __hash__(self):
         return hash((self.ticker, self.exp_date, self.data))

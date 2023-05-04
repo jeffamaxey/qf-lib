@@ -59,19 +59,28 @@ class Trade:
         if self is other:
             return True
 
-        if not isinstance(other, Trade):
-            return False
-
-        return (self.ticker, self.start_time, self.end_time, self.pnl, self.commission, self.direction,
-                self.percentage_pnl) == (other.ticker, other.start_time, other.end_time, other.pnl, other.commission,
-                                         other.direction, other.percentage_pnl)
+        return (
+            (
+                self.ticker,
+                self.start_time,
+                self.end_time,
+                self.pnl,
+                self.commission,
+                self.direction,
+                self.percentage_pnl,
+            )
+            == (
+                other.ticker,
+                other.start_time,
+                other.end_time,
+                other.pnl,
+                other.commission,
+                other.direction,
+                other.percentage_pnl,
+            )
+            if isinstance(other, Trade)
+            else False
+        )
 
     def __str__(self):
-        string_template = f"{self.__class__.__name__} ({date_to_str(self.start_time)} - " \
-                          f"{date_to_str(self.end_time)}) -> " \
-                          f"Asset: {self.ticker:>20}, " \
-                          f"Direction: {self.direction:>8}, " \
-                          f"P&L %: {self.percentage_pnl:>10.2%}, " \
-                          f"P&L: {self.pnl:>10.2f}"
-
-        return string_template
+        return f"{self.__class__.__name__} ({date_to_str(self.start_time)} - {date_to_str(self.end_time)}) -> Asset: {self.ticker:>20}, Direction: {self.direction:>8}, P&L %: {self.percentage_pnl:>10.2%}, P&L: {self.pnl:>10.2f}"

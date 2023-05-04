@@ -105,14 +105,20 @@ def create_line_chart(
         series_label = _get_name(names_list, names_index)
         if series_label is not None:
             legend_decorator.add_entry(
-                data_element, series_label + " [{}]".format(point_to_emphasise[0].strftime("%b %y")))
+                data_element,
+                series_label + f' [{point_to_emphasise[0].strftime("%b %y")}]',
+            )
 
         names_index += 1
         if not disable_dot:
             # Emphasise the last data point.
             point_emphasis = PointEmphasisDecorator(
-                data_element, point_to_emphasise, decimal_points=dot_decimal_points,
-                key="point_emphasis_{}".format(line_id), use_secondary_axes=data_element.use_secondary_axes)
+                data_element,
+                point_to_emphasise,
+                decimal_points=dot_decimal_points,
+                key=f"point_emphasis_{line_id}",
+                use_secondary_axes=data_element.use_secondary_axes,
+            )
             line_chart.add_decorator(point_emphasis)
 
     # Create a title.
@@ -130,7 +136,7 @@ def create_line_chart(
     # Create horizontal lines.
     if horizontal_lines_list is not None:
         for hline in horizontal_lines_list:
-            line_decorator = HorizontalLineDecorator(hline, key="hline" + str(hline))
+            line_decorator = HorizontalLineDecorator(hline, key=f"hline{str(hline)}")
             line_chart.add_decorator(line_decorator)
             series_label = _get_name(names_list, names_index)
             if series_label is not None:
@@ -141,7 +147,7 @@ def create_line_chart(
     # Create vertical lines.
     if vertical_lines_list is not None:
         for vline in vertical_lines_list:
-            line_decorator = VerticalLineDecorator(vline, key="vline" + str(vline))
+            line_decorator = VerticalLineDecorator(vline, key=f"vline{str(vline)}")
             line_chart.add_decorator(line_decorator)
             series_label = _get_name(names_list, names_index)
             if series_label is not None:
@@ -166,6 +172,7 @@ def _get_last_valid_value(list: List[Any]) -> Any:
 
 def _get_name(names, index: int) -> str:
     if index > len(names) - 1:
-        raise IndexError("Could not find Legend name at index {}. Pass `None` if you do not wish to "
-                         "specify it.".format(index))
+        raise IndexError(
+            f"Could not find Legend name at index {index}. Pass `None` if you do not wish to specify it."
+        )
     return names[index]

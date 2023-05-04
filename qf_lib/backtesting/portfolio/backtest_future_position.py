@@ -30,12 +30,10 @@ class BacktestFuturePosition(BacktestPosition):
         return transaction_pnl - transaction.commission
 
     def _compute_profit_and_loss_fraction(self, price: float, quantity: int):
-        if sign(quantity) * self.direction() == -1:
-            price_pnl = price - self._avg_price_per_unit
-            # We multiply by the direction, so that the in case of finding a pair of transaction going in opposite
-            # directions, the realized pnl of this operation would consider the direction of the position
-            quantity = self.direction() * abs(quantity)
-            multiplier = quantity * self._ticker.point_value
-            return price_pnl * multiplier
-        else:
+        if sign(quantity) * self.direction() != -1:
             return 0.0
+        price_pnl = price - self._avg_price_per_unit
+        # We multiply by the direction, so that the in case of finding a pair of transaction going in opposite
+        # directions, the realized pnl of this operation would consider the direction of the position
+        quantity = self.direction() * abs(quantity)
+        return price_pnl * (quantity * self._ticker.point_value)

@@ -52,10 +52,10 @@ class RiskParityBoxes:
         """
         list_of_series = []
         for growth in ChangeDirection:
-            for inflation in ChangeDirection:
-                series = self._boxes_dict[growth][inflation]
-                list_of_series.append(series)
-
+            list_of_series.extend(
+                self._boxes_dict[growth][inflation]
+                for inflation in ChangeDirection
+            )
         return list_of_series
 
     @staticmethod
@@ -66,9 +66,9 @@ class RiskParityBoxes:
         (growth=FALLING, inflation=FALLING).
         """
         series_iter = iter(list_of_series)
-        growth_to_inflation_to_series = dict()
+        growth_to_inflation_to_series = {}
         for growth in ChangeDirection:
-            inflation_to_series = dict()
+            inflation_to_series = {}
             for inflation in ChangeDirection:
                 series = next(series_iter)
                 inflation_to_series[inflation] = series
@@ -109,10 +109,10 @@ class RiskParityBoxesFactory:
         asset_rets_df = self._get_assets_data(end_date, start_date, frequency)
 
         # create a dict: growth -> inflation -> None
-        boxes_df = dict()
+        boxes_df = {}
 
         for growth in ChangeDirection:
-            inflation_to_rets_dict = dict()
+            inflation_to_rets_dict = {}
             for inflation in ChangeDirection:
                 tickers = self.tickers_dict[growth][inflation]
                 asset_rets_for_box_df = asset_rets_df.loc[:, tickers]
@@ -125,34 +125,41 @@ class RiskParityBoxesFactory:
 
     @staticmethod
     def _create_tickers_dict():
-        # growth -> inflatoin -> tickers
-        tickers_dict = {
+        return {
             ChangeDirection.RISING: {
                 ChangeDirection.RISING: [
-                    BloombergTicker("SPGSCITR Index"),  # Commodities (S&P GSCI Total Return CME)
-                    BloombergTicker("MSBIERTR Index"),  # EM Debt (Morningstar Emerging Markets Corporate Bond Index TR)
-                    BloombergTicker("XAU Curncy")  # Gold (XAUUSD Spot Exchange Rate - Price of 1 XAU in USD)
+                    BloombergTicker(
+                        "SPGSCITR Index"
+                    ),  # Commodities (S&P GSCI Total Return CME)
+                    BloombergTicker(
+                        "MSBIERTR Index"
+                    ),  # EM Debt (Morningstar Emerging Markets Corporate Bond Index TR)
+                    BloombergTicker(
+                        "XAU Curncy"
+                    ),  # Gold (XAUUSD Spot Exchange Rate - Price of 1 XAU in USD)
                 ],
                 ChangeDirection.FALLING: [
                     BloombergTicker("MXUS Index"),  # Equity USA (MSCI USA)
-                    BloombergTicker("LQD US Equity")  # Credit (ISHARES IBOXX investment grade corporate bond etf)
-                ]
+                    BloombergTicker(
+                        "LQD US Equity"
+                    ),  # Credit (ISHARES IBOXX investment grade corporate bond etf)
+                ],
             },
             ChangeDirection.FALLING: {
                 ChangeDirection.RISING: [
                     # ILB (Bloomberg Barclays US Inflation Linked Bonds 1 to 10 Year TR)
                     BloombergTicker("BCIT3T Index"),
                     # Gold (XAUUSD Spot Exchange Rate - Price of 1 XAU in USD)
-                    BloombergTicker("XAU Curncy")
+                    BloombergTicker("XAU Curncy"),
                 ],
                 ChangeDirection.FALLING: [
                     BloombergTicker("IEF US Equity"),  # Gov bonds (7-10y treasury)
-                    BloombergTicker("XAU Curncy")  # Gold (XAUUSD Spot Exchange Rate - Price of 1 XAU in USD)
-                ]
-            }
+                    BloombergTicker(
+                        "XAU Curncy"
+                    ),  # Gold (XAUUSD Spot Exchange Rate - Price of 1 XAU in USD)
+                ],
+            },
         }
-
-        return tickers_dict
 
     @staticmethod
     def _get_all_tickers(tickers_dict):
@@ -175,10 +182,7 @@ class RiskParityBoxesFactory:
         # remove intermediate NaNs
         trimmed_asset_prices_df = trimmed_asset_prices_df.fillna(method='pad')  # forward fill
 
-        # convert to simple returns
-        assets_rets = trimmed_asset_prices_df.to_simple_returns()
-
-        return assets_rets
+        return trimmed_asset_prices_df.to_simple_returns()
 
     @staticmethod
     def _calculate_box(asset_returns_df: SimpleReturnsDataFrame) -> SimpleReturnsSeries:

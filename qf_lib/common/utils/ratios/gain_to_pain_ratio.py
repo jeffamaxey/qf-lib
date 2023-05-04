@@ -41,8 +41,8 @@ def gain_to_pain_ratio(qf_series: QFSeries) -> float:
     aggregated_series = get_aggregate_returns(qf_series, Frequency.MONTHLY, multi_index=True)
     negative_returns = aggregated_series.loc[aggregated_series < 0]
     negative_sum = np.abs(negative_returns.sum())
-    if negative_sum != 0:
-        gain_to_pain = aggregated_series.sum() / negative_sum
-    else:
-        gain_to_pain = float("inf")
-    return gain_to_pain
+    return (
+        aggregated_series.sum() / negative_sum
+        if negative_sum != 0
+        else float("inf")
+    )

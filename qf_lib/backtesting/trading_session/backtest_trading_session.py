@@ -85,7 +85,7 @@ class BacktestTradingSession(TradingSession):
         self.data_handler.use_data_bundle(sorted(tickers), sorted(PriceField.ohlcv()), data_start, self.end_date,
                                           self.frequency)
         self._hash_of_data_bundle = compute_container_hash(self.data_handler.data_provider.data_bundle)
-        self.logger.info("Preloaded data hash value {}".format(self._hash_of_data_bundle))
+        self.logger.info(f"Preloaded data hash value {self._hash_of_data_bundle}")
 
     def get_preloaded_data_checksum(self) -> str:
         """

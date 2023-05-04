@@ -106,7 +106,9 @@ class ModelParamsEvaluationDocument:
         """
         param_names = self._get_param_names()
 
-        self.document.add_element(HeadingElement(1, "Model: {}".format(self.backtest_summary.backtest_name)))
+        self.document.add_element(
+            HeadingElement(1, f"Model: {self.backtest_summary.backtest_name}")
+        )
         self.document.add_element(ParagraphElement("\n"))
 
         self.document.add_element(HeadingElement(2, "Tickers tested in this study: "))
@@ -115,16 +117,26 @@ class ModelParamsEvaluationDocument:
         self.document.add_element(ParagraphElement("\n"))
 
         self.document.add_element(HeadingElement(2, "Dates of the backtest"))
-        self.document.add_element(ParagraphElement("Backtest start date: {}"
-                                                   .format(date_to_str(self.backtest_summary.start_date))))
-        self.document.add_element(ParagraphElement("Backtest end date: {}"
-                                                   .format(date_to_str(self.backtest_summary.end_date))))
+        self.document.add_element(
+            ParagraphElement(
+                f"Backtest start date: {date_to_str(self.backtest_summary.start_date)}"
+            )
+        )
+        self.document.add_element(
+            ParagraphElement(
+                f"Backtest end date: {date_to_str(self.backtest_summary.end_date)}"
+            )
+        )
         self.document.add_element(ParagraphElement("\n"))
 
         self.document.add_element(HeadingElement(2, "Parameters Tested"))
         for param_index, param_list in enumerate(self.backtest_summary.parameters_tested):
             param_list_str = ", ".join(map(str, param_list))
-            self.document.add_element(ParagraphElement("{} = [{}]".format(param_names[param_index], param_list_str)))
+            self.document.add_element(
+                ParagraphElement(
+                    f"{param_names[param_index]} = [{param_list_str}]"
+                )
+            )
 
         self.document.add_element(NewPageElement())
         self.document.add_element(HeadingElement(2, "Alpha model implementation"))
@@ -134,8 +146,7 @@ class ModelParamsEvaluationDocument:
         with open(inspect.getfile(model_type)) as f:
             class_implementation = f.read()
         # Remove the imports section
-        class_implementation = "<pre>class {}".format(model_type.__name__) + \
-                               class_implementation.split("class {}".format(model_type.__name__))[1] + "</pre>"
+        class_implementation = f'<pre>class {model_type.__name__}{class_implementation.split(f"class {model_type.__name__}")[1]}</pre>'
         self.document.add_element(CustomElement(class_implementation))
 
     def _add_line_plots(self, tickers: Sequence[Ticker]):
@@ -157,13 +168,13 @@ class ModelParamsEvaluationDocument:
             avg_nr_of_trades = DataElementDecorator([x.avg_nr_of_trades_1Y for x in results])
             annualised_return = DataElementDecorator([x.annualised_return for x in results])
 
-            adjusted_start_time = min([x.start_date for x in results])
-            adjusted_end_time = max([x.end_date for x in results])
+            adjusted_start_time = min(x.start_date for x in results)
+            adjusted_end_time = max(x.end_date for x in results)
             if adjusted_start_time >= adjusted_end_time:
                 adjusted_end_time = adjusted_start_time if adjusted_start_time <= self.backtest_summary.end_date \
-                    else end_time
+                        else end_time
                 adjusted_start_time = start_time
-            title = "{} - {} ".format(adjusted_start_time.strftime("%Y-%m-%d"), adjusted_end_time.strftime("%Y-%m-%d"))
+            title = f'{adjusted_start_time.strftime("%Y-%m-%d")} - {adjusted_end_time.strftime("%Y-%m-%d")} '
 
             title_to_plot["SQN (Arithmetic return) per year"].add_decorator(sqn_avg_nr_trades)
             title_to_legend["SQN (Arithmetic return) per year"].add_entry(sqn_avg_nr_trades, title)
@@ -180,7 +191,7 @@ class ModelParamsEvaluationDocument:
         )
 
         for description, line_chart in title_to_plot.items():
-            self.document.add_element(HeadingElement(3, "{} - {}".format(description, tickers_used)))
+            self.document.add_element(HeadingElement(3, f"{description} - {tickers_used}"))
             line_chart.add_decorator(AxesLabelDecorator(x_label=self._get_param_names()[0], y_label=title))
             position_decorator = AxesPositionDecorator(*self.image_axis_position)
             line_chart.add_decorator(position_decorator)
@@ -215,9 +226,9 @@ class ModelParamsEvaluationDocument:
             adjusted_end_time = results.applymap(lambda x: x.end_date).max().max()
             if adjusted_start_time >= adjusted_end_time:
                 adjusted_end_time = adjusted_start_time if adjusted_start_time <= self.backtest_summary.end_date \
-                    else end_time
+                        else end_time
                 adjusted_start_time = start_time
-            title = "{} - {} ".format(adjusted_start_time.strftime("%Y-%m-%d"), adjusted_end_time.strftime("%Y-%m-%d"))
+            title = f'{adjusted_start_time.strftime("%Y-%m-%d")} - {adjusted_end_time.strftime("%Y-%m-%d")} '
 
             title_to_grid["SQN (Arithmetic return) per year"].add_chart(
                 self._create_single_heat_map(title, sqn_avg_nr_trades, 0, 0.5))
@@ -234,7 +245,7 @@ class ModelParamsEvaluationDocument:
         )
 
         for description, grid in title_to_grid.items():
-            self.document.add_element(HeadingElement(3, "{} - {}".format(description, tickers_used)))
+            self.document.add_element(HeadingElement(3, f"{description} - {tickers_used}"))
             self.document.add_element(grid)
 
     def _create_single_heat_map(self, title, result_df, min_v, max_v):
@@ -255,15 +266,14 @@ class ModelParamsEvaluationDocument:
         return model_parameters_names[0]
 
     def save(self, title: Optional[str] = None):
-        if self.document is not None:
-            output_sub_dir = "param_estimation"
-
-            # Set the style for the report
-            plt.style.use(['tearsheet'])
-            if title is None:
-                title = self.backtest_summary.backtest_name
-            filename = "%Y_%m_%d-%H%M {}.pdf".format(title)
-            filename = datetime.now().strftime(filename)
-            self.pdf_exporter.generate([self.document], output_sub_dir, filename)
-        else:
+        if self.document is None:
             raise AssertionError("The documnent is not initialized. Build the document first")
+        output_sub_dir = "param_estimation"
+
+        # Set the style for the report
+        plt.style.use(['tearsheet'])
+        if title is None:
+            title = self.backtest_summary.backtest_name
+        filename = f"%Y_%m_%d-%H%M {title}.pdf"
+        filename = datetime.now().strftime(filename)
+        self.pdf_exporter.generate([self.document], output_sub_dir, filename)

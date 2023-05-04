@@ -65,11 +65,12 @@ class VolumeOrdersFilter(OrdersFilter):
             adjusted_orders_tuples = [self._adjust_quantity(order, stop_orders_dict.get(order.ticker, None), volume_df)
                                       for order in orders if not isinstance(order.execution_style, StopOrder)]
 
-            # Flatten the list of orders tuples
-            adjusted_orders = [order for orders_tuple in adjusted_orders_tuples
-                               for order in orders_tuple if order is not None and order.quantity != 0]
-
-            return adjusted_orders
+            return [
+                order
+                for orders_tuple in adjusted_orders_tuples
+                for order in orders_tuple
+                if order is not None and order.quantity != 0
+            ]
         except ValueError as e:
             self.logger.warning(f"VolumeOrdersFilter: orders cannot be adjusted due to the following reason: {e}",
                                 stack_info=True)
@@ -110,5 +111,4 @@ class VolumeOrdersFilter(OrdersFilter):
         return order, stop_order
 
     def __str__(self):
-        return 'VolumeOrdersFilter:\n' \
-               '\tvolume_percentage_limit: {}\n'.format(self._volume_percentage_limit)
+        return f'VolumeOrdersFilter:\n\tvolume_percentage_limit: {self._volume_percentage_limit}\n'

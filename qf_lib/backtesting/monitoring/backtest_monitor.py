@@ -93,7 +93,9 @@ class BacktestMonitor(AbstractMonitor):
         self._monitor_settings = BacktestMonitorSettings() if monitor_settings is None else monitor_settings
         self.benchmark_tms = benchmark_tms
 
-        sub_dir_name = datetime.now().strftime("%Y_%m_%d-%H%M {}".format(backtest_result.backtest_name))
+        sub_dir_name = datetime.now().strftime(
+            f"%Y_%m_%d-%H%M {backtest_result.backtest_name}"
+        )
         self._report_dir = path.join("backtesting", sub_dir_name)
 
         self._init_live_progress_chart(backtest_result)
@@ -153,7 +155,9 @@ class BacktestMonitor(AbstractMonitor):
             end_date = backtest_result.end_date if backtest_result.end_date is not None else datetime.now()
             self._ax.set_xlim(backtest_result.start_date, end_date)
             self._ax.grid()
-            self._ax.set_title("Progress of the backtest - {}".format(backtest_result.backtest_name))
+            self._ax.set_title(
+                f"Progress of the backtest - {backtest_result.backtest_name}"
+            )
             self._figure.autofmt_xdate(rotation=20)
 
     @ErrorHandling.error_logging
@@ -161,25 +165,31 @@ class BacktestMonitor(AbstractMonitor):
         """
         Creates a new csv file for every backtest run, writes the header and returns the file handler and writer object
         """
-        if self._monitor_settings.issue_transaction_log:
-            output_dir = path.join(get_starting_dir_abs_path(), self._settings.output_directory, self._report_dir)
-            if not path.exists(output_dir):
-                makedirs(output_dir)
+        if not self._monitor_settings.issue_transaction_log:
+            return None, None
+        output_dir = path.join(get_starting_dir_abs_path(), self._settings.output_directory, self._report_dir)
+        if not path.exists(output_dir):
+            makedirs(output_dir)
 
-            csv_filename = "%Y_%m_%d-%H%M Transactions.csv"
-            csv_filename = datetime.now().strftime(csv_filename)
-            file_path = path.expanduser(path.join(output_dir, csv_filename))
+        csv_filename = "%Y_%m_%d-%H%M Transactions.csv"
+        csv_filename = datetime.now().strftime(csv_filename)
+        file_path = path.expanduser(path.join(output_dir, csv_filename))
 
-            # Write new file header
-            fieldnames = ["Timestamp", "Asset Name", "Contract symbol", "Security type", "Contract size", "Quantity",
-                          "Price", "Commission"]
-
-            file_handler = open(file_path, 'a', newline='')
-            writer = csv.DictWriter(file_handler, fieldnames=fieldnames)
-            writer.writeheader()
-            csv_writer = csv.writer(file_handler)
-            return file_handler, csv_writer
-        return None, None
+        file_handler = open(file_path, 'a', newline='')
+        fieldnames = [
+            "Timestamp",
+            "Asset Name",
+            "Contract symbol",
+            "Security type",
+            "Contract size",
+            "Quantity",
+            "Price",
+            "Commission",
+        ]
+        writer = csv.DictWriter(file_handler, fieldnames=fieldnames)
+        writer.writeheader()
+        csv_writer = csv.writer(file_handler)
+        return file_handler, csv_writer
 
     @ErrorHandling.error_logging
     def _close_files(self):
@@ -256,28 +266,29 @@ class BacktestMonitor(AbstractMonitor):
         Create TradeAnalysisSheet and write all the Trades into an Excel file.
         Issues a report with R multiply if initial risk is specified, otherwise returns of trades are expressed in %
         """
-        if self._monitor_settings.issue_trade_analysis_sheet:
-            trades_generator = TradesGenerator()
-            portfolio_eod_series = self.backtest_result.portfolio.portfolio_eod_series()
-            closed_positions = self.backtest_result.portfolio.closed_positions()
-            trades_list = trades_generator.create_trades_from_backtest_positions(closed_positions, portfolio_eod_series)
+        if not self._monitor_settings.issue_trade_analysis_sheet:
+            return
+        trades_generator = TradesGenerator()
+        portfolio_eod_series = self.backtest_result.portfolio.portfolio_eod_series()
+        closed_positions = self.backtest_result.portfolio.closed_positions()
+        trades_list = trades_generator.create_trades_from_backtest_positions(closed_positions, portfolio_eod_series)
 
-            if len(trades_list) > 0:
-                nr_of_assets_traded = len(set(t.ticker.name for t in trades_list))
-                start_date = self.backtest_result.start_date or portfolio_eod_series.index[0]
-                end_date = self.backtest_result.end_date or datetime.now()
+        if len(trades_list) > 0:
+            nr_of_assets_traded = len({t.ticker.name for t in trades_list})
+            start_date = self.backtest_result.start_date or portfolio_eod_series.index[0]
+            end_date = self.backtest_result.end_date or datetime.now()
 
-                trades_analysis_sheet = TradeAnalysisSheet(self._settings, self._pdf_exporter,
-                                                           nr_of_assets_traded=nr_of_assets_traded,
-                                                           trades=trades_list,
-                                                           start_date=start_date,
-                                                           end_date=end_date,
-                                                           initial_risk=self.backtest_result.initial_risk,
-                                                           title="Trades analysis sheet")
-                trades_analysis_sheet.build_document()
-                trades_analysis_sheet.save(self._report_dir)
-            else:
-                self.logger.info("No trades generated during the backtest - TradeAnalysisSheet will not be generated.")
+            trades_analysis_sheet = TradeAnalysisSheet(self._settings, self._pdf_exporter,
+                                                       nr_of_assets_traded=nr_of_assets_traded,
+                                                       trades=trades_list,
+                                                       start_date=start_date,
+                                                       end_date=end_date,
+                                                       initial_risk=self.backtest_result.initial_risk,
+                                                       title="Trades analysis sheet")
+            trades_analysis_sheet.build_document()
+            trades_analysis_sheet.save(self._report_dir)
+        else:
+            self.logger.info("No trades generated during the backtest - TradeAnalysisSheet will not be generated.")
 
     @ErrorHandling.error_logging
     def _issue_factor_sector_exposure_sheet(self):
@@ -309,26 +320,27 @@ class BacktestMonitor(AbstractMonitor):
 
     @ErrorHandling.error_logging
     def _issue_signal_log(self):
-        if self._monitor_settings.issue_signal_log:
-            signals_df = self._signals_register.get_signals()
-            xlsx_filename = "%Y_%m_%d-%H%M Signals.xlsx"
-            xlsx_filename = datetime.now().strftime(xlsx_filename)
-            file_path = path.join(self._report_dir, xlsx_filename)
+        if not self._monitor_settings.issue_signal_log:
+            return
+        signals_df = self._signals_register.get_signals()
+        xlsx_filename = "%Y_%m_%d-%H%M Signals.xlsx"
+        xlsx_filename = datetime.now().strftime(xlsx_filename)
+        file_path = path.join(self._report_dir, xlsx_filename)
 
-            # Export the signals only if the data frame is not empty
-            if not signals_df.empty:
-                sheet_names_to_functions = {
-                    "Tickers": lambda s: s.symbol if isinstance(s, Signal) else s,
-                    "Suggested exposure": lambda s: s.suggested_exposure.value if isinstance(s, Signal) else s,
-                    "Confidence": lambda s: s.confidence if isinstance(s, Signal) else s,
-                    "Expected move": lambda s: s.expected_move if isinstance(s, Signal) else s,
-                    "Fraction at risk": lambda s: s.fraction_at_risk if isinstance(s, Signal) else s
-                }
+        # Export the signals only if the data frame is not empty
+        if not signals_df.empty:
+            sheet_names_to_functions = {
+                "Tickers": lambda s: s.symbol if isinstance(s, Signal) else s,
+                "Suggested exposure": lambda s: s.suggested_exposure.value if isinstance(s, Signal) else s,
+                "Confidence": lambda s: s.confidence if isinstance(s, Signal) else s,
+                "Expected move": lambda s: s.expected_move if isinstance(s, Signal) else s,
+                "Fraction at risk": lambda s: s.fraction_at_risk if isinstance(s, Signal) else s
+            }
 
-                for sheet_name, fun in sheet_names_to_functions.items():
-                    df = signals_df.applymap(fun)
-                    self._excel_exporter.export_container(df, file_path, sheet_name=sheet_name,
-                                                          starting_cell='A1', include_column_names=True)
+            for sheet_name, fun in sheet_names_to_functions.items():
+                df = signals_df.applymap(fun)
+                self._excel_exporter.export_container(df, file_path, sheet_name=sheet_name,
+                                                      starting_cell='A1', include_column_names=True)
 
     @ErrorHandling.error_logging
     def _live_chart_update(self):

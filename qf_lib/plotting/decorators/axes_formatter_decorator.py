@@ -47,11 +47,7 @@ class AxesFormatterDecorator(ChartDecorator):
         self._use_secondary_axes = use_secondary_axes
 
     def decorate(self, chart: "Chart"):
-        if self._use_secondary_axes:
-            ax = chart.secondary_axes
-        else:
-            ax = chart.axes
-
+        ax = chart.secondary_axes if self._use_secondary_axes else chart.axes
         if self._x_major is not None:
             ax.xaxis.set_major_formatter(self._x_major)
         if self._x_minor is not None:
@@ -76,9 +72,4 @@ class PercentageFormatter(Formatter):
 
     @classmethod
     def percent_sign(cls) -> str:
-        if matplotlib.rcParams['text.usetex'] is True:
-            percent_sign = r'$\%$'  # The percent symbol needs escaping in latex
-        else:
-            percent_sign = '%'
-
-        return percent_sign
+        return r'$\%$' if matplotlib.rcParams['text.usetex'] is True else '%'

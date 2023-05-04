@@ -98,7 +98,11 @@ def create_bar_chart(
         color = style_colors[(len(style_colors) - i % len(style_colors)) - 1]
         # Add a series line decorator for each line.
         line_decorator = SeriesLineDecorator(
-            lines[i][start_x:end_x], key="series_line_" + str(i), linewidth=4, color=color)
+            lines[i][start_x:end_x],
+            key=f"series_line_{str(i)}",
+            linewidth=4,
+            color=color,
+        )
         line_decorators.append(line_decorator)
 
         bar_chart.add_decorator(line_decorator)
@@ -156,11 +160,10 @@ def _quarterly_formatter(x, pos: int, show_every: int, date_label_format):
     x = num2date(x)
     if pos is None:
         return x
+    if pos % show_every == 0:
+        return x.strftime(date_label_format.format(get_quarter(x)))
     else:
-        if pos % show_every == 0:
-            return x.strftime(date_label_format.format(get_quarter(x)))
-        else:
-            return ""
+        return ""
 
 
 def _create_legend(bar_chart, data_elements, line_decorators, names_list, quarterly: bool) -> LegendDecorator:
@@ -173,8 +176,8 @@ def _create_legend(bar_chart, data_elements, line_decorators, names_list, quarte
             date = data_element.data.index[-1]
             formatted_date = date.strftime("%b %y")
             if quarterly:
-                formatted_date = "Q{} {}".format(str(date.quarter), date.year)
-            last_date_label = " [{}]".format(formatted_date)
+                formatted_date = f"Q{str(date.quarter)} {date.year}"
+            last_date_label = f" [{formatted_date}]"
             legend_decorator.add_entry(data_element, bar_label + last_date_label)
         i += 1
 

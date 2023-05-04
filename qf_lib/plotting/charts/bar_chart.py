@@ -86,7 +86,7 @@ class BarChart(Chart):
             # copy the general plot settings and add DataElementDecorator-specific plot settings to the copy
             # (overwrite general plot settings if necessary)
             plot_settings = dict(self._plot_settings)
-            plot_settings.update(data_element.plot_settings)
+            plot_settings |= data_element.plot_settings
 
             # set color for the bars if it's not specified
             if "color" not in plot_settings:
@@ -132,15 +132,26 @@ class BarChart(Chart):
         return negative_bars if positive_bars is None else positive_bars
 
     def _plot_bars(self, axes, data, index, last_positions, plot_settings):
-        bars = None
         if len(data) > 0:
-            if self._orientation == Orientation.Vertical:
-                # The bottom parameter specifies the y coordinate of where each bar should start (it's a list of values)
-                bars = axes.bar(index, data, bottom=last_positions, width=self._thickness, **plot_settings)
-            else:
-                # The left parameter specifies the x coordinate of where each bar should start (it's a list of values)
-                bars = axes.barh(index, data, left=last_positions, height=self._thickness, **plot_settings)
-        return bars
+            return (
+                axes.bar(
+                    index,
+                    data,
+                    bottom=last_positions,
+                    width=self._thickness,
+                    **plot_settings
+                )
+                if self._orientation == Orientation.Vertical
+                else axes.barh(
+                    index,
+                    data,
+                    left=last_positions,
+                    height=self._thickness,
+                    **plot_settings
+                )
+            )
+        else:
+            return None
 
     def _trim_data(self, data):
         # do not trim data using index as it does not make sense for bar chart

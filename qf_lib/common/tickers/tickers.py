@@ -44,10 +44,10 @@ class Ticker(metaclass=ABCMeta):
         self.logger = qf_logger.getChild(self.__class__.__name__)
 
     def __str__(self):
-        return "{}('{}')".format(self.__class__.__name__, self.ticker)
+        return f"{self.__class__.__name__}('{self.ticker}')"
 
     def __repr__(self):
-        return "{}('{}')".format(self.__class__.__name__, self.ticker)
+        return f"{self.__class__.__name__}('{self.ticker}')"
 
     def as_string(self) -> str:
         """
@@ -187,7 +187,7 @@ class BinanceTicker(Ticker):
         self._rounding_precision = rounding_precision
 
     @classmethod
-    def from_string(self, ticker_str: Union[str, Sequence[str]]) -> Union['Ticker', Sequence['Ticker']]:
+    def from_string(cls, ticker_str: Union[str, Sequence[str]]) -> Union['Ticker', Sequence['Ticker']]:
         raise NotImplementedError('Binance from_string method is not implemented. Please use init function.')
 
     @property
@@ -228,7 +228,7 @@ class HaverTicker(Ticker):
         """
         returns a string that can be used by the official Haver API to get the series
         """
-        return self.ticker + '@' + self.database_name
+        return f'{self.ticker}@{self.database_name}'
 
     @classmethod
     def from_string(cls, ticker_str: Union[str, Sequence[str]], security_type: SecurityType = SecurityType.STOCK,
@@ -272,14 +272,14 @@ class QuandlTicker(Ticker):
     def as_string(self) -> str:
         if self.database_type == QuandlDBType.Timeseries:
             # returns a string that corresponds to the notation used by Quandl Timeseries: db_name/ticker
-            return self.database_name + '/' + self.ticker
+            return f'{self.database_name}/{self.ticker}'
         elif self.database_type == QuandlDBType.Table:
             return self.ticker
         else:
-            raise TypeError("Incorrect database type: {}".format(self.database_type))
+            raise TypeError(f"Incorrect database type: {self.database_type}")
 
     def field_to_column_name(self, field: str):
-        return self.as_string() + ' - ' + field
+        return f'{self.as_string()} - {field}'
 
     @classmethod
     def from_string(cls, ticker_str: Union[str, Sequence[str]], db_type: QuandlDBType = QuandlDBType.Timeseries,

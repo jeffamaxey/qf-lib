@@ -74,13 +74,18 @@ class IntradayDataHandler(DataHandler):
         end_date += RelativeDelta(second=0, microsecond=0)
 
         frequency_delta = to_offset(frequency.to_pandas_freq()).delta.value
-        if current_time <= end_date:
-            end_date_without_lookahead = Timestamp(math.floor(Timestamp(current_time).value / frequency_delta) *
-                                                   frequency_delta).to_pydatetime() - frequency.time_delta()
-        else:
-            end_date_without_lookahead = Timestamp(math.floor(Timestamp(end_date).value / frequency_delta) *
-                                                   frequency_delta).to_pydatetime()
-        return end_date_without_lookahead
+        return (
+            Timestamp(
+                math.floor(Timestamp(current_time).value / frequency_delta)
+                * frequency_delta
+            ).to_pydatetime()
+            - frequency.time_delta()
+            if current_time <= end_date
+            else Timestamp(
+                math.floor(Timestamp(end_date).value / frequency_delta)
+                * frequency_delta
+            ).to_pydatetime()
+        )
 
     def get_last_available_price(self, tickers: Union[Ticker, Sequence[Ticker]], frequency: Frequency = None,
                                  end_time: Optional[datetime] = None) -> Union[float, QFSeries]:

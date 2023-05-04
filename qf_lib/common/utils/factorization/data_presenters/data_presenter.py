@@ -73,12 +73,8 @@ class DataPresenter:
         fund_name = self._get_security_name(analysed_tms.name)
 
         iso_date = DateFormat.ISO.format_string
-        today_iso_date = datetime.today().strftime(iso_date)
-        model_info = '\n=============================================================\n' \
-                     '\t Fund name: {}                     {} \n' \
-                     '=============================================================\n' \
-                     '\t Coefficient \tTicker          Security name\n' \
-                     '-------------------------------------------------------------\n'.format(fund_name, today_iso_date)
+        today_iso_date = datetime.now().strftime(iso_date)
+        model_info = f'\n=============================================================\n\t Fund name: {fund_name}                     {today_iso_date} \n=============================================================\n\t Coefficient \tTicker          Security name\n-------------------------------------------------------------\n'
 
         for col_nr, ticker in enumerate(regressors_df.columns):
             security_name = self.ticker_to_security_name_dict.get(ticker, "")
@@ -93,7 +89,7 @@ class DataPresenter:
         frequency = str(self.model.input_data.frequency)
 
         model_info += 'The model was build based on {:d} {:s} returns \n' \
-                      'between {:s} and {:s}. \n'.format(num_of_returns, frequency, start_date, end_date)
+                          'between {:s} and {:s}. \n'.format(num_of_returns, frequency, start_date, end_date)
 
         return model_info
 
@@ -307,9 +303,10 @@ class DataPresenter:
         auto_correlations = self.model.autocorrelation
         infos = ['autocorrelations:']
 
-        for i, auto_corr in enumerate(auto_correlations, start=1):
-            infos.append('        Autocorrelation (lag {:d}): {:s}'.format(i, str(auto_corr)))
-
+        infos.extend(
+            '        Autocorrelation (lag {:d}): {:s}'.format(i, str(auto_corr))
+            for i, auto_corr in enumerate(auto_correlations, start=1)
+        )
         return '\n'.join(infos)
 
     def get_t_statistics_info(self) -> str:
@@ -318,9 +315,12 @@ class DataPresenter:
             t_values = t_values[:-1]  # don't take the last t-value which corresponds to the "constant" factor
 
         infos = ["t-statistics:"]
-        for ticker, t_val in t_values.iteritems():
-            infos.append('        {:< 9.3f}   {:s}'.format(t_val, self._get_security_name(ticker)))
-
+        infos.extend(
+            '        {:< 9.3f}   {:s}'.format(
+                t_val, self._get_security_name(ticker)
+            )
+            for ticker, t_val in t_values.iteritems()
+        )
         return '\n'.join(infos)
 
     def get_p_values_info(self) -> str:
@@ -329,9 +329,12 @@ class DataPresenter:
             p_values = p_values[:-1]  # don't take the last t-value which corresponds to the "constant" factor
 
         infos = ["p-values"]
-        for ticker, p_val in p_values.iteritems():
-            infos.append('        {:< 9.3f}   {:s}'.format(p_val, self._get_security_name(ticker)))
-
+        infos.extend(
+            '        {:< 9.3f}   {:s}'.format(
+                p_val, self._get_security_name(ticker)
+            )
+            for ticker, p_val in p_values.iteritems()
+        )
         return '\n'.join(infos)
 
     def get_condition_number_info(self) -> str:
@@ -345,13 +348,13 @@ class DataPresenter:
         colors = cycle(Chart.get_axes_colors())
         color = next(colors)
 
-        marker_props = {'alpha': 0.7}
-        stemline_props = {'linestyle': '-.', 'linewidth': 0.2}
         baseline_props = {'visible': False}
-        marker_props['markeredgecolor'] = color
-        marker_props['markerfacecolor'] = color
-        stemline_props['color'] = color
-
+        marker_props = {
+            'alpha': 0.7,
+            'markeredgecolor': color,
+            'markerfacecolor': color,
+        }
+        stemline_props = {'linestyle': '-.', 'linewidth': 0.2, 'color': color}
         data_elem = StemDecorator(cooks_dist, marker_props=marker_props,
                                   stemline_props=stemline_props, baseline_props=baseline_props)
 

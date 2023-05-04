@@ -157,7 +157,7 @@ class PortfolioAnalysisSheet(AbstractDocument):
 
             concentration_top_asset = DataElementDecorator(top_assets_percentage_value)
             chart.add_decorator(concentration_top_asset)
-            legend.add_entry(concentration_top_asset, "TOP {} assets".format(assets_number))
+            legend.add_entry(concentration_top_asset, f"TOP {assets_number} assets")
 
         self.document.add_element(ChartElement(chart, figsize=self.full_image_size, dpi=self.dpi))
 
@@ -306,11 +306,14 @@ class PortfolioAnalysisSheet(AbstractDocument):
 
         self.document.add_element(NewPageElement())
         self.document.add_element(HeadingElement(level=2, text="Performance of each asset"))
-        final_performance = performance_df. \
-            applymap(lambda pnl_series: pnl_series.iloc[-1] if not pnl_series.empty else 0.0). \
-            sort_values(by="Overall performance", ascending=False). \
-            applymap(lambda p: '{:,.2f}'.format(p)). \
-            reset_index()
+        final_performance = (
+            performance_df.applymap(
+                lambda pnl_series: 0.0 if pnl_series.empty else pnl_series.iloc[-1]
+            )
+            .sort_values(by="Overall performance", ascending=False)
+            .applymap(lambda p: '{:,.2f}'.format(p))
+            .reset_index()
+        )
         table = DFTable(final_performance, css_classes=['table', 'left-align'])
         table.add_columns_classes(["Tickers name"], 'wide-column')
         self.document.add_element(table)
@@ -352,7 +355,9 @@ class PortfolioAnalysisSheet(AbstractDocument):
         return return_data
 
     def _plot_ticker_performance(self, ticker_name: str, performance):
-        self.document.add_element(HeadingElement(level=2, text="PnL of {}".format(ticker_name)))
+        self.document.add_element(
+            HeadingElement(level=2, text=f"PnL of {ticker_name}")
+        )
 
         chart = LineChart()
         legend = LegendDecorator(key="legend_decorator")

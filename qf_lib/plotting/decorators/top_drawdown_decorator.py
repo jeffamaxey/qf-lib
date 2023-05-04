@@ -40,10 +40,7 @@ class TopDrawdownDecorator(ChartDecorator):
 
     def __init__(self, prices: QFSeries, count: int, colors: List[str] = None, key: str = None):
         super().__init__(key)
-        if colors is None:
-            self._color = Chart.get_axes_colors()[3]
-        else:
-            self._color = cycle(colors)
+        self._color = Chart.get_axes_colors()[3] if colors is None else cycle(colors)
         self._current_color = 0
 
         self._series = prices

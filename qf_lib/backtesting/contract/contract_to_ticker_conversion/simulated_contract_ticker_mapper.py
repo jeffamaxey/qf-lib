@@ -22,10 +22,12 @@ class SimulatedContractTickerMapper(ContractTickerMapper):
 
     def contract_to_ticker(self, contract: Ticker) -> Ticker:
         """ Maps Contract objects into Tickers. """
-        ticker = contract
-        return ticker
+        return contract
 
     def ticker_to_contract(self, ticker: Ticker) -> Ticker:
         """ Maps contract parameters to corresponding ticker. """
-        contract = ticker.get_current_specific_ticker() if isinstance(ticker, FutureTicker) else ticker
-        return contract
+        return (
+            ticker.get_current_specific_ticker()
+            if isinstance(ticker, FutureTicker)
+            else ticker
+        )

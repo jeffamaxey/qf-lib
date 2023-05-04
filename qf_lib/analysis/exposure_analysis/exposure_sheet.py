@@ -71,7 +71,7 @@ class ExposureSheet(AbstractDocument):
     def save(self, report_dir: str = ""):
         # Set the style for the report
         plt.style.use(['tearsheet'])
-        filename = "%Y_%m_%d-%H%M {}.pdf".format("Exposure Sheet")
+        filename = '%Y_%m_%d-%H%M Exposure Sheet.pdf'
         filename = datetime.now().strftime(filename)
         return self.pdf_exporter.generate([self.document], report_dir, filename)
 

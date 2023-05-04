@@ -73,11 +73,10 @@ class BloombergBeapHapiParser:
         active_tickers = content.index.unique()
         content = content.squeeze()
 
-        data = {
-            active_ticker: content.loc[active_ticker].values.tolist() for active_ticker in active_tickers
+        return {
+            active_ticker: content.loc[active_ticker].values.tolist()
+            for active_ticker in active_tickers
         }
-
-        return data
 
     def get_current_values_dates_fields_format(self, filepath: str) -> QFDataFrame:
         """
@@ -165,8 +164,10 @@ class BloombergBeapHapiParser:
         f = gzip.open(filepath, 'rb')
         data = f.read().decode("utf-8")
         # Without re.DOTALL, each line of the input text matches the pattern separately
-        fields = re.search(r'START-OF-FIELDS\n(.*?)\nEND-OF-FIELDS', data, re.DOTALL).group(1).split('\n')
-        content = re.search(r'START-OF-DATA\n(.*?)\nEND-OF-DATA', data, re.DOTALL).group(1)
+        fields = re.search(
+            r'START-OF-FIELDS\n(.*?)\nEND-OF-FIELDS', data, re.DOTALL
+        )[1].split('\n')
+        content = re.search(r'START-OF-DATA\n(.*?)\nEND-OF-DATA', data, re.DOTALL)[1]
 
         column_names = column_names + fields if column_names is not None else None
         content = self._read_csv(content, column_names, replace_header)
@@ -182,7 +183,6 @@ class BloombergBeapHapiParser:
         # Remove trailing delimiters
         content = "\n".join(line.rstrip("|") for line in content.split("\n"))
         lines = csv.reader(StringIO(content), delimiter=delimiter)
-        records = list(lines) if not replace_header else list(lines)[1:]
+        records = list(lines)[1:] if replace_header else list(lines)
         records = [line for line in records if len(line) == len(column_names)]
-        df = QFDataFrame.from_records(records, columns=column_names)
-        return df
+        return QFDataFrame.from_records(records, columns=column_names)

@@ -94,9 +94,9 @@ class AlphaModelStrategy(AbstractStrategy):
 
     def calculate_and_place_orders(self):
         date = self.timer.now().date()
-        self.logger.info("[{}] Signals Generation Started".format(date))
+        self.logger.info(f"[{date}] Signals Generation Started")
         signals = self._calculate_signals()
-        self.logger.info("[{}] Signals Generation Finished".format(date))
+        self.logger.info(f"[{date}] Signals Generation Finished")
 
         self.logger.debug("Signals: ")
         for s in signals:
@@ -105,9 +105,9 @@ class AlphaModelStrategy(AbstractStrategy):
         if self._max_open_positions is not None:
             self._adjust_number_of_open_positions(signals)
 
-        self.logger.info("[{}] Placing Orders".format(date))
+        self.logger.info(f"[{date}] Placing Orders")
         self._place_orders(signals)
-        self.logger.info("[{}] Orders Placed".format(date))
+        self.logger.info(f"[{date}] Orders Placed")
 
     def _adjust_number_of_open_positions(self, signals: List[Signal]):
         """
@@ -123,12 +123,17 @@ class AlphaModelStrategy(AbstractStrategy):
         (for example Gold) and not specific contracts (Jul 2020 Gold). Therefore even if 2 or more contracts
         corresponding to one family existed in the portfolio, they would be counted as 1 open position.
         """
-        open_positions_specific_tickers = set(position.ticker() for position in self._broker.get_positions())
+        open_positions_specific_tickers = {
+            position.ticker() for position in self._broker.get_positions()
+        }
 
         def position_for_ticker_exists_in_portfolio(ticker: Ticker) -> bool:
             if isinstance(ticker, FutureTicker):
                 # Check if any of specific tickers with open positions in portfolio belongs to tickers family
-                return any([ticker.belongs_to_family(t) for t in open_positions_specific_tickers])
+                return any(
+                    ticker.belongs_to_family(t)
+                    for t in open_positions_specific_tickers
+                )
             else:
                 return ticker in open_positions_specific_tickers
 
@@ -174,7 +179,9 @@ class AlphaModelStrategy(AbstractStrategy):
         return signals
 
     def _place_orders(self, signals):
-        self.logger.info("Converting Signals to Orders using: {}".format(self._position_sizer.__class__.__name__))
+        self.logger.info(
+            f"Converting Signals to Orders using: {self._position_sizer.__class__.__name__}"
+        )
         orders = self._position_sizer.size_signals(signals, self._use_stop_losses, self._time_in_force, self._frequency)
 
         close_orders = self._futures_rolling_orders_generator.generate_close_orders()
@@ -182,7 +189,9 @@ class AlphaModelStrategy(AbstractStrategy):
 
         for orders_filter in self._orders_filters:
             if orders:
-                self.logger.info("Filtering Orders based on selected requirements: {}".format(orders_filter))
+                self.logger.info(
+                    f"Filtering Orders based on selected requirements: {orders_filter}"
+                )
                 orders = orders_filter.adjust_orders(orders)
 
         self.logger.info("Cancelling all open orders")
@@ -205,7 +214,7 @@ class AlphaModelStrategy(AbstractStrategy):
         """
         ticker_to_quantity = {position.ticker(): position.quantity() for position in current_positions}
         assert len(ticker_to_quantity.keys()) == len(current_positions), "There should be max 1 position open per" \
-                                                                         " ticker"
+                                                                             " ticker"
 
         current_ticker = ticker.get_current_specific_ticker() if isinstance(ticker, FutureTicker) else ticker
         current_ticker_quantity = ticker_to_quantity.get(current_ticker, 0)
@@ -218,21 +227,21 @@ class AlphaModelStrategy(AbstractStrategy):
             if len(matching_positions) > 1:
                 matching_tickers = [p.ticker().as_string() for p in matching_positions]
                 raise AssertionError(
-                    "There should be no more then 1 position open for an already expired contract for a"
-                    " future ticker. Detected positions open for the following contracts: {}.".format(
-                        ", ".join(matching_tickers)))
+                    f'There should be no more then 1 position open for an already expired contract for a future ticker. Detected positions open for the following contracts: {", ".join(matching_tickers)}.'
+                )
 
-            current_ticker_quantity = 0 if not matching_positions else matching_positions[0].quantity()
+            current_ticker_quantity = (
+                matching_positions[0].quantity() if matching_positions else 0
+            )
 
-        current_exposure = Exposure(np.sign(current_ticker_quantity))
-        return current_exposure
+        return Exposure(np.sign(current_ticker_quantity))
 
     def _log_configuration(self):
         self.logger.info("AlphaModelStrategy configuration:")
         for model, tickers in self._model_tickers_dict.items():
-            self.logger.info('Model: {}'.format(str(model)))
+            self.logger.info(f'Model: {str(model)}')
             for ticker in tickers:
                 try:
-                    self.logger.info('\t Ticker: {}'.format(ticker.name))
+                    self.logger.info(f'\t Ticker: {ticker.name}')
                 except NoValidTickerException as e:
                     self.logger.info(e)

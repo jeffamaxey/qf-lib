@@ -57,13 +57,15 @@ class TradingSessionForTests(TradingSession):
         self.logger = qf_logger.getChild(self.__class__.__name__)
 
         self.logger.info(
-            "\n".join([
-                "Testing the Backtester:",
-                "Start date: {:s}".format(date_to_str(start_date)),
-                "End date: {:s}".format(date_to_str(end_date)),
-                "Initial cash: {:.2f}".format(initial_cash),
-                "Frequency of the simulated execution handler: {}".format(frequency)
-            ])
+            "\n".join(
+                [
+                    "Testing the Backtester:",
+                    "Start date: {:s}".format(date_to_str(start_date)),
+                    "End date: {:s}".format(date_to_str(end_date)),
+                    "Initial cash: {:.2f}".format(initial_cash),
+                    f"Frequency of the simulated execution handler: {frequency}",
+                ]
+            )
         )
 
         timer = SettableTimer(start_date)

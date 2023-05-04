@@ -48,7 +48,7 @@ def close_open_gap(prices_df: PricesDataFrame, initial_price: int = 1, transacti
 
     assert prices_df.num_of_rows > 1
     assert transaction_cost_percentage >= 0 and transaction_cost_value >= 0
-    assert not (transaction_cost_percentage > 0 and transaction_cost_value > 0)  # only one type may be used
+    assert transaction_cost_percentage <= 0 or transaction_cost_value <= 0
 
     o1 = prices_df[PriceField.Open]
     c0 = prices_df[PriceField.Close].shift(1)
@@ -66,6 +66,4 @@ def close_open_gap(prices_df: PricesDataFrame, initial_price: int = 1, transacti
 
     ret_tms = (sell_price / buy_price) - 1
     ret_tms = cast_series(ret_tms.iloc[1:], SimpleReturnsSeries)
-    prices_tms = ret_tms.to_prices(initial_price)
-
-    return prices_tms
+    return ret_tms.to_prices(initial_price)

@@ -191,21 +191,19 @@ class BloombergBeapHapiDataProvider(AbstractPriceDataProvider):
         return normalized_result
 
     def price_field_to_str_map(self, ticker: BloombergTicker = None) -> Dict[PriceField, str]:
-        price_field_dict = {
+        return {
             PriceField.Open: 'PX_OPEN',
             PriceField.High: 'PX_HIGH',
             PriceField.Low: 'PX_LOW',
             PriceField.Close: 'PX_LAST',
-            PriceField.Volume: 'PX_VOLUME'
+            PriceField.Volume: 'PX_VOLUME',
         }
-        return price_field_dict
 
     def expiration_date_field_str_map(self, ticker: BloombergTicker = None) -> Dict[ExpirationDateField, str]:
-        expiration_date_field_dict = {
+        return {
             ExpirationDateField.FirstNotice: "FUT_NOTICE_FIRST",
-            ExpirationDateField.LastTradeableDate: "LAST_TRADEABLE_DT"
+            ExpirationDateField.LastTradeableDate: "LAST_TRADEABLE_DT",
         }
-        return expiration_date_field_dict
 
     def supported_ticker_types(self):
         return {BloombergTicker, BloombergFutureTicker}
@@ -341,7 +339,9 @@ class BloombergBeapHapiDataProvider(AbstractPriceDataProvider):
         request_id = 'cRequest' + str(datetime.now().strftime("%Y%m%d%H%M"))
         self.request_hapi_provider.create_request(request_id, universe_url, fieldlist_url, bulk_format_type=False)  # bulk format is ignored, but it gives response without column descirpition - easier to parse
 
-        self.logger.info('universe_id: {} fieldlist_id: {} request_id: {}'.format(universe_id, fieldlist_id, request_id))
+        self.logger.info(
+            f'universe_id: {universe_id} fieldlist_id: {fieldlist_id} request_id: {request_id}'
+        )
 
         out_path = self._download_response(request_id)
 
@@ -356,9 +356,7 @@ class BloombergBeapHapiDataProvider(AbstractPriceDataProvider):
         fields_indices = 0 if got_single_field else slice(None)
         squeezed_result = data_frame.iloc[tickers_indices, fields_indices]
 
-        casted_result = cast_dataframe_to_proper_type(squeezed_result)
-
-        return casted_result
+        return cast_dataframe_to_proper_type(squeezed_result)
 
     def _get_list_of_tickers_in_the_future_chain(self,
                                                  tickers: Union[BloombergFutureTicker, Sequence[BloombergFutureTicker]],
@@ -372,7 +370,7 @@ class BloombergBeapHapiDataProvider(AbstractPriceDataProvider):
         def future_ticker_from_string(active_ticker_string: str) -> BloombergFutureTicker:
             return active_ticker_string_to_future_ticker[active_ticker_string]
 
-        universe_id = 'u' + universe_creation_time
+        universe_id = f'u{universe_creation_time}'
         universe_url = self.universe_hapi_provider.get_universe_url(universe_id, active_ticker_string_to_future_ticker,
                                                                     fieldsOverrides=True)
 
@@ -406,7 +404,7 @@ class BloombergBeapHapiDataProvider(AbstractPriceDataProvider):
         if lacking_tickers:
             lacking_tickers_str = [t.name for t in lacking_tickers]
             error_message = "The requested futures chains for the BloombergFutureTickers {} could not have been " \
-                            "downloaded successfully".format(lacking_tickers_str)
+                                "downloaded successfully".format(lacking_tickers_str)
             self.logger.error(error_message)
 
             for ticker in lacking_tickers:
@@ -437,12 +435,13 @@ class BloombergBeapHapiDataProvider(AbstractPriceDataProvider):
             except KeyError:
                 self.logger.info("Received other event type, continue waiting")
             else:
-                is_required_reply = '{}.bbg'.format(request_id) == distribution_id
+                is_required_reply = f'{request_id}.bbg' == distribution_id
                 is_same_catalog = reply_catalog_id == self.catalog_id
 
                 if not is_required_reply or not is_same_catalog:
-                    self.logger.info("Some other delivery occurred - continue waiting. "
-                                     "Reply catalog id: {}".format(reply_catalog_id))
+                    self.logger.info(
+                        f"Some other delivery occurred - continue waiting. Reply catalog id: {reply_catalog_id}"
+                    )
                     continue
 
                 output_file_path = os.path.join(self.downloads_path, distribution_id)

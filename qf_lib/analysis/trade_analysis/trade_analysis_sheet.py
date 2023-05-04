@@ -204,8 +204,12 @@ class TradeAnalysisSheet(AbstractDocument):
         """
         self.document.add_element(NewPageElement())
         self.document.add_element(HeadingElement(level=1, text="Monte Carlo simulations\n"))
-        self.document.add_element(HeadingElement(level=2, text="Average number of trades per year: {}\n".format(
-            int(self._average_number_of_trades_per_year()))))
+        self.document.add_element(
+            HeadingElement(
+                level=2,
+                text=f"Average number of trades per year: {int(self._average_number_of_trades_per_year())}\n",
+            )
+        )
         if self.initial_risk is not None:
             self.document.add_element(HeadingElement(level=2, text="Initial risk: {:.2%}".format(self.initial_risk)))
 
@@ -334,18 +338,25 @@ class TradeAnalysisSheet(AbstractDocument):
         return chart
 
     def _get_distribution_summary_table(self, scenarios_results: SimpleReturnsSeries) -> DFTable:
-        rows = []
         percentage_list = [0.05, 0.1, 0.2, 0.3]
-        for percentage in percentage_list:
-            rows.append(("{:.0%} Tail".format(percentage),
-                         "{:.2%}".format(np.quantile(scenarios_results, percentage))))
-
+        rows = [
+            (
+                "{:.0%} Tail".format(percentage),
+                "{:.2%}".format(np.quantile(scenarios_results, percentage)),
+            )
+            for percentage in percentage_list
+        ]
         rows.append(("50%", "{:.2%}".format(np.quantile(scenarios_results, 0.5))))
 
-        for percentage in reversed(percentage_list):
-            rows.append(("{:.0%} Top".format(percentage),
-                         "{:.2%}".format(np.quantile(scenarios_results, (1.0 - percentage)))))
-
+        rows.extend(
+            (
+                "{:.0%} Top".format(percentage),
+                "{:.2%}".format(
+                    np.quantile(scenarios_results, (1.0 - percentage))
+                ),
+            )
+            for percentage in reversed(percentage_list)
+        )
         table = DFTable(data=QFDataFrame.from_records(rows, columns=["Measure", "Value"]),
                         css_classes=['table', 'left-align'])
         table.add_columns_classes(["Measure"], 'wide-column')
@@ -375,15 +386,11 @@ class TradeAnalysisSheet(AbstractDocument):
         table.add_columns_classes(["Chances of dropping below"], 'wide-column')
         return table
 
-    def _get_monte_carlos_simulator_outputs(self, scenarios_df: PricesDataFrame, total_returns: SimpleReturnsSeries) \
-            -> DFTable:
+    def _get_monte_carlos_simulator_outputs(self, scenarios_df: PricesDataFrame, total_returns: SimpleReturnsSeries) -> DFTable:
         _, all_scenarios_number = scenarios_df.shape
-        rows = []
-
         # Add the Median Return value
         median_return = np.median(total_returns)
-        rows.append(("Median Return", "{:.2%}".format(median_return)))
-
+        rows = [("Median Return", "{:.2%}".format(median_return))]
         # Add the Mean Return value
         mean_return = total_returns.mean()
         rows.append(("Mean Return", "{:.2%}".format(mean_return)))
@@ -400,11 +407,15 @@ class TradeAnalysisSheet(AbstractDocument):
         # Add the Median Drawdown
         max_drawdowns = max_drawdown(scenarios_df)
         median_drawdown = np.median(max_drawdowns)
-        rows.append(("Median Maximum Drawdown", "{:.2%}".format(median_drawdown)))
-
-        # Add the Median Return / Median Drawdown
-        rows.append(("Return / Drawdown", "{:.2f}".format(median_return / median_drawdown)))
-
+        rows.extend(
+            (
+                ("Median Maximum Drawdown", "{:.2%}".format(median_drawdown)),
+                (
+                    "Return / Drawdown",
+                    "{:.2f}".format(median_return / median_drawdown),
+                ),
+            )
+        )
         # Probability, that the return will be > 0
         scenarios_with_positive_result = total_returns[total_returns > 0.0].count()
         probability = scenarios_with_positive_result / all_scenarios_number
@@ -421,6 +432,6 @@ class TradeAnalysisSheet(AbstractDocument):
         # Set the style for the report
         plt.style.use(['tearsheet'])
 
-        filename = "%Y_%m_%d-%H%M {}.pdf".format(self.title)
+        filename = f"%Y_%m_%d-%H%M {self.title}.pdf"
         filename = datetime.now().strftime(filename)
         self.pdf_exporter.generate([self.document], report_dir, filename)

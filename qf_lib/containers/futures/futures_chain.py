@@ -152,11 +152,10 @@ class FuturesChain(pd.Series):
             # July. As the expiration of C1 occurred on the 16th, the computed prices_df data frame cannot be appended
             # to the chain and the chain should be regenerated.
             return self._preload_data_and_generate_chain(fields, start_date, end_date, frequency).squeeze()
-        else:
-            # Append the new prices to the existing PricesDataFrame chain
-            self._chain = self._chain.append(prices_after_last_date_in_chain, sort=False)
-            self._specific_ticker = self._future_ticker.ticker
-            return self._chain[fields_list].loc[start_date:end_date].squeeze()
+        # Append the new prices to the existing PricesDataFrame chain
+        self._chain = self._chain.append(prices_after_last_date_in_chain, sort=False)
+        self._specific_ticker = self._future_ticker.ticker
+        return self._chain[fields_list].loc[start_date:end_date].squeeze()
 
     def _preload_data_and_generate_chain(self, fields: Union[PriceField, Sequence[PriceField]], start_date: datetime,
                                          end_date: datetime, frequency: Frequency) -> \
@@ -381,7 +380,9 @@ class FuturesChain(pd.Series):
             self._future_ticker.get_current_specific_ticker()
         )
         last_ticker_position = min(future_tickers_exp_dates_series.size, current_contract_index + 1)
-        future_tickers_exp_dates_series = future_tickers_exp_dates_series.iloc[0:last_ticker_position]
+        future_tickers_exp_dates_series = future_tickers_exp_dates_series.iloc[
+            :last_ticker_position
+        ]
 
         # Download the historical prices
         future_tickers_list = list(future_tickers_exp_dates_series.values)

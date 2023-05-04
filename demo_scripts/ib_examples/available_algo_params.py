@@ -28,8 +28,7 @@ class AvailableAlgoParams(Object):
     def FillArrivalPriceParams(baseOrder: Order, maxPctVol: float, riskAversion: str, startTime: str, endTime: str,
                                forceCompletion: bool, allowPastTime: bool, monetaryValue: float):
         baseOrder.algoStrategy = "ArrivalPx"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("maxPctVol", maxPctVol))
+        baseOrder.algoParams = [TagValue("maxPctVol", maxPctVol)]
         baseOrder.algoParams.append(TagValue("riskAversion", riskAversion))
         baseOrder.algoParams.append(TagValue("startTime", startTime))
         baseOrder.algoParams.append(TagValue("endTime", endTime))
@@ -41,8 +40,7 @@ class AvailableAlgoParams(Object):
     def FillDarkIceParams(baseOrder: Order, displaySize: int, startTime: str, endTime: str, allowPastEndTime: bool,
                           monetaryValue: float):
         baseOrder.algoStrategy = "DarkIce"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("displaySize", displaySize))
+        baseOrder.algoParams = [TagValue("displaySize", displaySize)]
         baseOrder.algoParams.append(TagValue("startTime", startTime))
         baseOrder.algoParams.append(TagValue("endTime", endTime))
         baseOrder.algoParams.append(TagValue("allowPastEndTime", int(allowPastEndTime)))
@@ -52,8 +50,7 @@ class AvailableAlgoParams(Object):
     def FillPctVolParams(baseOrder: Order, pctVol: float, startTime: str, endTime: str, noTakeLiq: bool,
                          monetaryValue: float):
         baseOrder.algoStrategy = "PctVol"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("pctVol", pctVol))
+        baseOrder.algoParams = [TagValue("pctVol", pctVol)]
         baseOrder.algoParams.append(TagValue("startTime", startTime))
         baseOrder.algoParams.append(TagValue("endTime", endTime))
         baseOrder.algoParams.append(TagValue("noTakeLiq", int(noTakeLiq)))
@@ -63,8 +60,7 @@ class AvailableAlgoParams(Object):
     def FillTwapParams(baseOrder: Order, strategyType: str, startTime: str, endTime: str, allowPastEndTime: bool,
                        monetaryValue: float):
         baseOrder.algoStrategy = "Twap"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("strategyType", strategyType))
+        baseOrder.algoParams = [TagValue("strategyType", strategyType)]
         baseOrder.algoParams.append(TagValue("startTime", startTime))
         baseOrder.algoParams.append(TagValue("endTime", endTime))
         baseOrder.algoParams.append(TagValue("allowPastEndTime", int(allowPastEndTime)))
@@ -74,8 +70,7 @@ class AvailableAlgoParams(Object):
     def FillVwapParams(baseOrder: Order, maxPctVol: float, startTime: str, endTime: str, allowPastEndTime: bool,
                        noTakeLiq: bool, monetaryValue: float):
         baseOrder.algoStrategy = "Vwap"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("maxPctVol", maxPctVol))
+        baseOrder.algoParams = [TagValue("maxPctVol", maxPctVol)]
         baseOrder.algoParams.append(TagValue("startTime", startTime))
         baseOrder.algoParams.append(TagValue("endTime", endTime))
         baseOrder.algoParams.append(TagValue("allowPastEndTime", int(allowPastEndTime)))
@@ -87,8 +82,7 @@ class AvailableAlgoParams(Object):
                                        randomizeTime20: bool, randomizeSize55: bool, giveUp: int, catchUp: bool,
                                        waitForFill: bool, startTime: str, endTime: str):
         baseOrder.algoStrategy = "AD"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("componentSize", componentSize))
+        baseOrder.algoParams = [TagValue("componentSize", componentSize)]
         baseOrder.algoParams.append(TagValue("timeBetweenOrders", timeBetweenOrders))
         baseOrder.algoParams.append(TagValue("randomizeTime20", int(randomizeTime20)))
         baseOrder.algoParams.append(TagValue("randomizeSize55", int(randomizeSize55)))
@@ -101,29 +95,25 @@ class AvailableAlgoParams(Object):
     @staticmethod
     def FillBalanceImpactRiskParams(baseOrder: Order, maxPctVol: float, riskAversion: str, forceCompletion: bool):
         baseOrder.algoStrategy = "BalanceImpactRisk"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("maxPctVol", maxPctVol))
+        baseOrder.algoParams = [TagValue("maxPctVol", maxPctVol)]
         baseOrder.algoParams.append(TagValue("riskAversion", riskAversion))
         baseOrder.algoParams.append(TagValue("forceCompletion", int(forceCompletion)))
 
     @staticmethod
     def FillMinImpactParams(baseOrder: Order, maxPctVol: float):
         baseOrder.algoStrategy = "MinImpact"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("maxPctVol", maxPctVol))
+        baseOrder.algoParams = [TagValue("maxPctVol", maxPctVol)]
 
     @staticmethod
     def FillAdaptiveParams(baseOrder: Order, priority: str):
         baseOrder.algoStrategy = "Adaptive"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("adaptivePriority", priority))
+        baseOrder.algoParams = [TagValue("adaptivePriority", priority)]
 
     @staticmethod
     def FillClosePriceParams(baseOrder: Order, maxPctVol: float, riskAversion: str, startTime: str,
                              forceCompletion: bool, monetaryValue: float):
         baseOrder.AlgoStrategy = "ClosePx"
-        baseOrder.AlgoParams = []
-        baseOrder.AlgoParams.append(TagValue("maxPctVol", maxPctVol))
+        baseOrder.AlgoParams = [TagValue("maxPctVol", maxPctVol)]
         baseOrder.AlgoParams.append(TagValue("riskAversion", riskAversion))
         baseOrder.AlgoParams.append(TagValue("startTime", startTime))
         baseOrder.AlgoParams.append(TagValue("forceCompletion", int(forceCompletion)))
@@ -134,8 +124,7 @@ class AvailableAlgoParams(Object):
                                      maxPctVol4Px: float, startTime: str, endTime: str, noTakeLiq: bool,
                                      monetaryValue: float):
         baseOrder.AlgoStrategy = "PctVolPx"
-        baseOrder.AlgoParams = []
-        baseOrder.AlgoParams.append(TagValue("pctVol", pctVol))
+        baseOrder.AlgoParams = [TagValue("pctVol", pctVol)]
         baseOrder.AlgoParams.append(TagValue("deltaPctVol", deltaPctVol))
         baseOrder.AlgoParams.append(TagValue("minPctVol4Px", minPctVol4Px))
         baseOrder.AlgoParams.append(TagValue("maxPctVol4Px", maxPctVol4Px))
@@ -148,8 +137,7 @@ class AvailableAlgoParams(Object):
     def FillSizeVariantPctVolParams(baseOrder: Order, startPctVol: float, endPctVol: float, startTime: str,
                                     endTime: str, noTakeLiq: bool, monetaryValue: float):
         baseOrder.AlgoStrategy = "PctVolSz"
-        baseOrder.AlgoParams = []
-        baseOrder.AlgoParams.append(TagValue("startPctVol", startPctVol))
+        baseOrder.AlgoParams = [TagValue("startPctVol", startPctVol)]
         baseOrder.AlgoParams.append(TagValue("endPctVol", endPctVol))
         baseOrder.AlgoParams.append(TagValue("startTime", startTime))
         baseOrder.AlgoParams.append(TagValue("endTime", endTime))
@@ -160,8 +148,7 @@ class AvailableAlgoParams(Object):
     def FillTimeVariantPctVolParams(baseOrder: Order, startPctVol: float, endPctVol: float, startTime: str,
                                     endTime: str, noTakeLiq: bool, monetaryValue: float):
         baseOrder.AlgoStrategy = "PctVolTm"
-        baseOrder.AlgoParams = []
-        baseOrder.AlgoParams.append(TagValue("startPctVol", startPctVol))
+        baseOrder.AlgoParams = [TagValue("startPctVol", startPctVol)]
         baseOrder.AlgoParams.append(TagValue("endPctVol", endPctVol))
         baseOrder.AlgoParams.append(TagValue("startTime", startTime))
         baseOrder.AlgoParams.append(TagValue("endTime", endTime))
@@ -174,8 +161,7 @@ class AvailableAlgoParams(Object):
                                 minFillSize: int, wowOrderPct: float, wowMode: str, isBuyBack: bool, wowReference: str):
         # must be direct-routed to "JEFFALGO"
         baseOrder.algoStrategy = "VWAP"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("StartTime", startTime))
+        baseOrder.algoParams = [TagValue("StartTime", startTime)]
         baseOrder.algoParams.append(TagValue("EndTime", endTime))
         baseOrder.algoParams.append(TagValue("RelativeLimit", relativeLimit))
         baseOrder.algoParams.append(TagValue("MaxVolumeRate", maxVolumeRate))
@@ -194,8 +180,7 @@ class AvailableAlgoParams(Object):
                              minBlockSize: int, maxBlockSize: int, iWouldPrice: float):
         # must be direct-routed to "CSFBALGO"
         baseOrder.algoStrategy = "INLINE"
-        baseOrder.algoParams = []
-        baseOrder.algoParams.append(TagValue("StartTime", startTime))
+        baseOrder.algoParams = [TagValue("StartTime", startTime)]
         baseOrder.algoParams.append(TagValue("EndTime", endTime))
         baseOrder.algoParams.append(TagValue("ExecStyle", execStyle))
         baseOrder.algoParams.append(TagValue("MinPercent", minPercent))

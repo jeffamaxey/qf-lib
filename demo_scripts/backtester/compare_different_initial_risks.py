@@ -40,10 +40,9 @@ def _create_trading_session(init_risk: float):
     session_builder = container.resolve(BacktestTradingSessionBuilder)  # type: BacktestTradingSessionBuilder
     session_builder.set_position_sizer(InitialRiskPositionSizer, initial_risk=init_risk)
     session_builder.set_monitor_settings(BacktestMonitorSettings.no_stats())
-    session_builder.set_backtest_name("Initial Risk Testing - {}".format(init_risk))
+    session_builder.set_backtest_name(f"Initial Risk Testing - {init_risk}")
     session_builder.set_frequency(Frequency.DAILY)
-    ts = session_builder.build(start_date, end_date)
-    return ts
+    return session_builder.build(start_date, end_date)
 
 
 def get_trade_rets_values(ts: BacktestTradingSession, model: AlphaModel) -> List[float]:
@@ -59,8 +58,7 @@ def get_trade_rets_values(ts: BacktestTradingSession, model: AlphaModel) -> List
 
     trades_generator = TradesGenerator()
     trades = trades_generator.create_trades_from_backtest_positions(ts.portfolio.closed_positions())
-    returns_of_trades = [t.pnl for t in trades]
-    return returns_of_trades
+    return [t.pnl for t in trades]
 
 
 def main():
@@ -72,10 +70,9 @@ def main():
 
     nr_of_param_sets = len(initial_risks_list)
     test_start_time = time()
-    print("{} parameters sets to be tested".format(nr_of_param_sets))
+    print(f"{nr_of_param_sets} parameters sets to be tested")
 
-    param_set_ctr = 1
-    for init_risk in initial_risks_list:
+    for param_set_ctr, init_risk in enumerate(initial_risks_list, start=1):
         start_time = time()
         ts = _create_trading_session(init_risk)
         alpha_model = MovingAverageAlphaModel(5, 20, 1.25, ts.data_provider)  # Change to a different alpha model to test it
@@ -85,10 +82,8 @@ def main():
         )
 
         end_time = time()
-        print("{} / {} initial risk parameters tested".format(param_set_ctr, nr_of_param_sets))
+        print(f"{param_set_ctr} / {nr_of_param_sets} initial risk parameters tested")
         print("iteration time = {:5.2f} minutes".format((end_time - start_time) / 60))
-        param_set_ctr += 1
-
         scenarios_df_list.append(scenarios_df)
 
     print("\nGenerating stats...")

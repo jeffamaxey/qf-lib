@@ -22,16 +22,15 @@ def get_starting_dir_abs_path() -> str:
     Returns the absolute path to the starting directory of the project. Starting directory is used for example for
     turning relative paths (from Settings) into absolute paths (those paths are relative to the starting directory).
     """
-    if _starting_dir is None:
-        dir_path = os.getenv("QF_STARTING_DIRECTORY")
-
-        if dir_path is None:
-            raise KeyError("Starting directory wasn't set. Use set_starting_dir_abs_path() function "
-                           "or set the environment variable QF_STARTING_DIRECTORY to the proper value")
-        else:
-            return dir_path
-    else:
+    if _starting_dir is not None:
         return _starting_dir
+    dir_path = os.getenv("QF_STARTING_DIRECTORY")
+
+    if dir_path is None:
+        raise KeyError("Starting directory wasn't set. Use set_starting_dir_abs_path() function "
+                       "or set the environment variable QF_STARTING_DIRECTORY to the proper value")
+    else:
+        return dir_path
 
 
 def set_starting_dir_abs_path(starting_dir_abs_path: str) -> None:

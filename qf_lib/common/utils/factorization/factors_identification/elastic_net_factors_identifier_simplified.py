@@ -80,6 +80,4 @@ class ElasticNetFactorsIdentifierSimplified(FactorsIdentifier):
         feature_selector = SelectFromModel(estimator, threshold=self.epsilon)
         feature_selector.fit(regressors_df, analysed_tms)
         selected_features = feature_selector.get_support()
-        selected_regressors_df = regressors_df.loc[:, selected_features]
-
-        return selected_regressors_df
+        return regressors_df.loc[:, selected_features]

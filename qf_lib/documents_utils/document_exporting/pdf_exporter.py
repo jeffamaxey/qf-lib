@@ -105,14 +105,15 @@ class PDFExporter(DocumentExporter):
 
             # If we've set custom css files, add them to the pdf
             if css_file_names is not None:
-                for name in css_file_names:
-                    css_file_paths.append(CSS(os.path.join(self._document_css_dir, name + ".css")))
-
+                css_file_paths.extend(
+                    CSS(os.path.join(self._document_css_dir, f"{name}.css"))
+                    for name in css_file_names
+                )
             # Parse the HTML.
             html = HTML(string=html)
 
             # Write out the PDF.
-            self.logger.info("Rendering PDF in {}...".format(output_filename))
+            self.logger.info(f"Rendering PDF in {output_filename}...")
             html.write_pdf(output_filename, css_file_paths)
 
         return output_filename

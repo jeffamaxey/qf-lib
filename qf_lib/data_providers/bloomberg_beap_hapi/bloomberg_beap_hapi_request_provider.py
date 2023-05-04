@@ -138,7 +138,7 @@ class BloombergBeapHapiRequestsProvider:
         self._create_request_common(request_id, request_payload)
 
     def _create_request_common(self, request_id: str, request_payload: Dict):
-        request_url = urljoin(self.account_url, 'requests/{}/'.format(request_id))
+        request_url = urljoin(self.account_url, f'requests/{request_id}/')
 
         # check if already exists, if not then post
         response = self.session.get(request_url)

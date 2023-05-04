@@ -70,5 +70,4 @@ class RegularDateTimeRule:
         elif self.trigger_time.microsecond is not None:
             time_adjustment = RelativeDelta(seconds=1)
 
-        next_trigger_time = start_time + time_adjustment
-        return next_trigger_time
+        return start_time + time_adjustment

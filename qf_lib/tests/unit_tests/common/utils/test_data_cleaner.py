@@ -39,9 +39,7 @@ class TestDataCleaner(TestCase):
 
         index = pd.date_range(start='2015-01-01', periods=6)
         columns = ['a', 'b', 'c', 'd', 'e']
-        dataframe = SimpleReturnsDataFrame(data=values, index=index, columns=columns)
-
-        return dataframe
+        return SimpleReturnsDataFrame(data=values, index=index, columns=columns)
 
     @classmethod
     def _create_test_benchmark(cls):

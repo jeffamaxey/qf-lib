@@ -45,6 +45,4 @@ class RiskParityPortfolio(Portfolio):
         if self.upper_constraints is not None:
             weights = put_weights_below_constraint(weights, self.upper_constraints)
 
-        weights_series = QFSeries(data=weights, index=self.assets_returns_df.columns.copy())
-
-        return weights_series
+        return QFSeries(data=weights, index=self.assets_returns_df.columns.copy())

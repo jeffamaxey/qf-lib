@@ -44,7 +44,7 @@ class HTMLExporter(DocumentExporter):
             documents = [self._merge_documents(documents, filename)]
 
         for document in documents:
-            self.logger.info("Generating: {}".format(document.name))
+            self.logger.info(f"Generating: {document.name}")
             if include_table_of_contents:
                 self._add_table_of_contents(document)
 
@@ -56,7 +56,7 @@ class HTMLExporter(DocumentExporter):
 
             # Write out the HTML.
             assert len(document.name) > 0
-            output_filename = os.path.join(output_dir, document.name) + ".html"
+            output_filename = f"{os.path.join(output_dir, document.name)}.html"
 
             with open(output_filename, "w") as file:
                 file.write(html)

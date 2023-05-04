@@ -98,8 +98,8 @@ def main(path_to_data_files: str, ticker: PortaraTicker):
     ts.start_trading()
 
     backtest_tms = ts.portfolio.portfolio_eod_series().to_log_returns()
-    print("mean daily log return: {}".format(backtest_tms.mean()))
-    print("std of daily log returns: {}".format(backtest_tms.std()))
+    print(f"mean daily log return: {backtest_tms.mean()}")
+    print(f"std of daily log returns: {backtest_tms.std()}")
 
 
 if __name__ == "__main__":

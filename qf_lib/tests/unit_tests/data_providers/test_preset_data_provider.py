@@ -61,13 +61,20 @@ class TestPresetDataProvider(unittest.TestCase):
         cached_fields_idx = pd.Index(PriceField.ohlcv(), name=FIELDS)
 
         rng = np.random.default_rng(2021)
-        data_array = QFDataArray.create(
-            data=rng.integers(20, 50, (len(cached_dates_idx), len(cached_tickers_idx), len(cached_fields_idx))),
+        return QFDataArray.create(
+            data=rng.integers(
+                20,
+                50,
+                (
+                    len(cached_dates_idx),
+                    len(cached_tickers_idx),
+                    len(cached_fields_idx),
+                ),
+            ),
             dates=cached_dates_idx,
             tickers=cls.tickers,
-            fields=PriceField.ohlcv()
+            fields=PriceField.ohlcv(),
         )
-        return data_array
 
     def test_get_last_available_price_invalid_end_date(self):
         data = self.data_provider_min_1.get_last_available_price(self.ticker, frequency=Frequency.MIN_1)

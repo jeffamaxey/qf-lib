@@ -114,7 +114,7 @@ class AbstractDocument(metaclass=ABCMeta):
 
     def _get_perf_chart(self, series_list, is_large_chart, title="Strategy Performance"):
         strategy = series_list[0].to_prices(1)  # the main strategy should be the first series
-        log_scale = True if strategy[-1] > 10 else False  # use log scale for returns above 1 000 %
+        log_scale = strategy[-1] > 10
 
         if is_large_chart:
             chart = LineChart(start_x=strategy.index[0], end_x=strategy.index[-1], log_scale=log_scale)
@@ -214,7 +214,7 @@ class AbstractDocument(metaclass=ABCMeta):
 
         position_decorator = AxesPositionDecorator(*self.full_image_axis_position)
         chart.add_decorator(position_decorator)
-        title_str = "{} - Rolling Stats [{} {} samples]".format(function_name, rolling_window_len, freq)
+        title_str = f"{function_name} - Rolling Stats [{rolling_window_len} {freq} samples]"
 
         title_decorator = TitleDecorator(title_str, key="title")
         chart.add_decorator(title_decorator)

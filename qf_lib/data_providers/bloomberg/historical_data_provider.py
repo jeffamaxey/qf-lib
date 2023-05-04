@@ -45,8 +45,7 @@ class HistoricalDataProvider:
         self.logger = qf_logger.getChild(self.__class__.__name__)
 
     def get(self, tickers: Sequence[BloombergTicker], fields: Sequence[str], start_date: datetime, end_date: datetime,
-            frequency: Frequency, currency: str = None, override_name: str = None, override_value: Any = None) \
-            -> QFDataArray:
+            frequency: Frequency, currency: str = None, override_name: str = None, override_value: Any = None) -> QFDataArray:
         """ Gets historical data from Bloomberg.
 
         If the frequency is higher than the daily - the Intraday Bar Request is used, otherwise - the Historical Data
@@ -54,13 +53,22 @@ class HistoricalDataProvider:
         is a valid Intraday Bar Request parameter.
         """
         ref_data_service = self._session.getService(REF_DATA_SERVICE_URI)
-        if frequency > Frequency.DAILY:
-            assert all(parameter is None for parameter in (currency, override_name, override_value))
-            qf_data_array = self._get_intraday_data(ref_data_service, tickers, fields, start_date, end_date, frequency)
-        else:
-            qf_data_array = self._get_historical_data(ref_data_service, tickers, fields, start_date, end_date,
-                                                      frequency, currency, override_name, override_value)
-        return qf_data_array
+        if frequency <= Frequency.DAILY:
+            return self._get_historical_data(
+                ref_data_service,
+                tickers,
+                fields,
+                start_date,
+                end_date,
+                frequency,
+                currency,
+                override_name,
+                override_value,
+            )
+        assert all(parameter is None for parameter in (currency, override_name, override_value))
+        return self._get_intraday_data(
+            ref_data_service, tickers, fields, start_date, end_date, frequency
+        )
 
     def _get_historical_data(self, ref_data_service, tickers: Sequence[BloombergTicker], fields: Sequence[str],
                              start_date: datetime, end_date: datetime, frequency: Frequency, currency: str,
@@ -83,7 +91,7 @@ class HistoricalDataProvider:
                            frequency):
         """ Sends requests for each ticker and combines the outputs together. """
 
-        tickers_data_dict = dict()
+        tickers_data_dict = {}
 
         for ticker in tickers:
             request = ref_data_service.createRequest("IntradayBarRequest")

@@ -44,8 +44,7 @@ def kelly(qf_series: QFSeries) -> float:
     mean = returns_tms.mean()
     variance = returns_tms.var()
 
-    kelly_criterion_value = mean / variance
-    return kelly_criterion_value
+    return mean / variance
 
 
 def kelly_binary(win_probability: float, win_size: float, lose_size: float) -> float:
@@ -74,5 +73,6 @@ def kelly_binary(win_probability: float, win_size: float, lose_size: float) -> f
 
     """
 
-    kelly_value = (-win_size * win_probability + lose_size * win_probability - lose_size) / (win_size * lose_size)
-    return kelly_value
+    return (
+        -win_size * win_probability + lose_size * win_probability - lose_size
+    ) / (win_size * lose_size)

@@ -78,7 +78,7 @@ class MarketOrdersExecutor(SimulatedExecutor):
             return QFSeries()
 
         assert self._frequency >= Frequency.DAILY, "Lower than daily frequency is not supported by the simulated" \
-                                                   " executor"
+                                                       " executor"
 
         # Compute the time ranges, used further by the get_price function
         current_datetime = self._timer.now()
@@ -87,7 +87,11 @@ class MarketOrdersExecutor(SimulatedExecutor):
         market_open_time = current_datetime + MarketOpenEvent.trigger_time() == current_datetime
 
         # In case of daily frequency, current price may be returned only at the Market Open or Market Close time
-        if self._frequency == Frequency.DAILY and not (market_open_time or market_close_time):
+        if (
+            self._frequency == Frequency.DAILY
+            and not market_open_time
+            and not market_close_time
+        ):
             return QFSeries(index=tickers)
 
         if self._frequency == Frequency.DAILY:
@@ -104,8 +108,13 @@ class MarketOrdersExecutor(SimulatedExecutor):
             start_time_range = current_datetime
 
         price_field = PriceField.Close if market_close_time else PriceField.Open
-        prices = self._data_provider.get_price(tickers, price_field, start_time_range, start_time_range, self._frequency)
-        return prices
+        return self._data_provider.get_price(
+            tickers,
+            price_field,
+            start_time_range,
+            start_time_range,
+            self._frequency,
+        )
 
     def _check_order_validity(self, order):
         assert order.execution_style == MarketOrder(), \

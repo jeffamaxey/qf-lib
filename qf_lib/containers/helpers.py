@@ -35,10 +35,7 @@ def compute_container_hash(data_container: Union[QFSeries, QFDataFrame, QFDataAr
     str
         hexadecimal digest of data in the passed data container
     """
-    if isinstance(data_container, QFSeries):
-        hashed_container = hash_pandas_object(data_container)
-
-    elif isinstance(data_container, QFDataFrame):
+    if isinstance(data_container, (QFSeries, QFDataFrame)):
         hashed_container = hash_pandas_object(data_container)
 
     elif isinstance(data_container, QFDataArray):

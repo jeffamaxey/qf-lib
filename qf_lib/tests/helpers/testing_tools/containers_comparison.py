@@ -51,12 +51,17 @@ def assert_lists_equal(expected_list: Sequence[T], actual_list: Sequence[T],
     assert expected_list_length == actual_list_length, \
         "Different lengths of lists. Expected: {:d}, got {:d}".format(expected_list_length, actual_list_length)
 
-    different_vals = []  # type: List[str]
-    for i, (expected_val, actual_val) in enumerate(zip(expected_list, actual_list)):
-        if _two_values_are_different(expected_val, actual_val, absolute_tolerance, relative_tolerance):
-            different_vals.append("{:<7d}   {:25s}   {:25s}".format(i, str(expected_val), str(actual_val)))
-
-    if different_vals:
+    if different_vals := [
+        "{:<7d}   {:25s}   {:25s}".format(
+            i, str(expected_val), str(actual_val)
+        )
+        for i, (expected_val, actual_val) in enumerate(
+            zip(expected_list, actual_list)
+        )
+        if _two_values_are_different(
+            expected_val, actual_val, absolute_tolerance, relative_tolerance
+        )
+    ]:
         different_vals = ["\n{:7s}   {:25s}   {:25s}".format("Index", "Expected", "Actual")] + different_vals
         raise AssertionError("\n".join(different_vals))
 
@@ -70,13 +75,13 @@ def _two_values_are_different(expected_val, actual_val, absolute_tolerance, rela
 
 def _two_numbers_are_equal(expected_val, actual_val, absolute_tolerance, relative_tolerance):
     if np.isnan(expected_val):
-        result = np.isnan(actual_val)
+        return np.isnan(actual_val)
     elif np.isnan(actual_val):
-        result = False
+        return False
     else:
-        result = abs(actual_val - expected_val) <= absolute_tolerance + relative_tolerance * abs(expected_val)
-
-    return result
+        return abs(
+            actual_val - expected_val
+        ) <= absolute_tolerance + relative_tolerance * abs(expected_val)
 
 
 def assert_series_equal(expected_series: pd.Series, actual_series: pd.Series,
@@ -321,9 +326,12 @@ def _assert_same_series_values(expected_series, actual_series, absolute_toleranc
         expected_vals = expected_series[different_values_idx]
         actual_vals = actual_series[different_values_idx]
 
-        messages = []
-
-        for label, expected_val, actual_val in zip(index_labels_for_incorrect_vals, expected_vals, actual_vals):
-            messages.append("{:s} - Expected: {:f}, actual: {:f}".format(str(label), expected_val, actual_val))
-
+        messages = [
+            "{:s} - Expected: {:f}, actual: {:f}".format(
+                str(label), expected_val, actual_val
+            )
+            for label, expected_val, actual_val in zip(
+                index_labels_for_incorrect_vals, expected_vals, actual_vals
+            )
+        ]
         raise AssertionError("Different series values for labels:\n" + "\n".join(messages))

@@ -62,9 +62,7 @@ class SquareRootMarketImpactSlippage(Slippage):
 
         tickers = [order.ticker for order in orders]
         market_impact_values = self._compute_market_impact(date, tickers, fill_volumes)
-        fill_prices = no_slippage_fill_prices * np.add(market_impact_values, 1.0)
-
-        return fill_prices
+        return no_slippage_fill_prices * np.add(market_impact_values, 1.0)
 
     def _compute_market_impact(self, date: datetime, tickers: Sequence[Ticker], fill_volumes: Sequence[float]) \
             -> Sequence[float]:
@@ -104,5 +102,4 @@ class SquareRootMarketImpactSlippage(Slippage):
         """Compute the average volume of the last self._number_of_samples days"""
         volume_tms = volume_tms.dropna().iloc[-self._number_of_samples:]
         volume_tms = volume_tms[volume_tms >= 0]
-        adv = volume_tms.mean()
-        return adv
+        return volume_tms.mean()

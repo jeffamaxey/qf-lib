@@ -297,7 +297,9 @@ class PresetDataProvider(DataProvider):
         }
         specific_tickers = list(tickers_mapping.keys())
 
-        fields, got_single_field = convert_to_list(fields, type(fields) if not isinstance(fields, Sequence) else str)
+        fields, got_single_field = convert_to_list(
+            fields, str if isinstance(fields, Sequence) else type(fields)
+        )
         got_single_date = self._got_single_date(start_date, end_date, frequency)
 
         self._check_if_cached_data_available(specific_tickers, fields, start_date, end_date)
@@ -311,22 +313,17 @@ class PresetDataProvider(DataProvider):
         return normalized_result
 
     def get_futures_chain_tickers(self, tickers: Union[FutureTicker, Sequence[FutureTicker]],
-                                  expiration_date_fields: Union[ExpirationDateField, Sequence[ExpirationDateField]]) \
-            -> Dict[FutureTicker, Union[QFSeries, QFDataFrame]]:
+                                  expiration_date_fields: Union[ExpirationDateField, Sequence[ExpirationDateField]]) -> Dict[FutureTicker, Union[QFSeries, QFDataFrame]]:
 
         tickers, got_single_ticker = convert_to_list(tickers, Ticker)
 
-        # Check if the futures tickers are in the exp_dates keys
-        uncached_future_tickers = set(tickers) - set(self._exp_dates.keys())
-        if uncached_future_tickers:
+        if uncached_future_tickers := set(tickers) - set(self._exp_dates.keys()):
             tickers_str = [t.name for t in tickers]
-            raise ValueError("Tickers: {} are not available in the Data Bundle".format(tickers_str))
+            raise ValueError(
+                f"Tickers: {tickers_str} are not available in the Data Bundle"
+            )
 
-        future_chain_tickers = {
-            ticker: self._exp_dates[ticker] for ticker in tickers
-        }
-
-        return future_chain_tickers
+        return {ticker: self._exp_dates[ticker] for ticker in tickers}
 
     def _map_normalized_result(self, normalized_result, tickers_mapping, tickers):
         # Map the specific tickers onto the tickers given by the tickers_mapping array

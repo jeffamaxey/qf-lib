@@ -107,9 +107,13 @@ class PointEmphasisDecorator(ChartDecorator, SimpleLegendItem):
 
         # Go through each each decorator, to see if any point emphasis decorators overlap this one.
         for key, decorator in line_chart._decorators.items():
-            if isinstance(decorator, PointEmphasisDecorator) and decorator._text_pos is not None and key != self.key:
-                if abs(pos[1] - decorator._text_pos[1]) < proximity:
-                    # If we are overlapping, move the label up.
-                    pos[1] += movement_constant
+            if (
+                isinstance(decorator, PointEmphasisDecorator)
+                and decorator._text_pos is not None
+                and key != self.key
+                and abs(pos[1] - decorator._text_pos[1]) < proximity
+            ):
+                # If we are overlapping, move the label up.
+                pos[1] += movement_constant
 
         return pos

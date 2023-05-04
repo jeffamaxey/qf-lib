@@ -48,11 +48,7 @@ class GridElement(Element):
             charts added via ``add_chart``.
         """
         super().__init__()
-        if elements is None:
-            self._elements = []
-        else:
-            self._elements = elements
-
+        self._elements = [] if elements is None else elements
         self.mode = mode
         self.figsize = figsize
         self.dpi = dpi
@@ -80,10 +76,7 @@ class GridElement(Element):
         -------
         An array of base64 images (with the encoding prefix)
         """
-        temp = list()
-        for element in self._elements:
-            temp.append(element.generate_json())
-        return temp
+        return [element.generate_json() for element in self._elements]
 
     def add_chart(self, chart: Chart, grid_proportion=GridProportion.Eight) -> ChartElement:
         """

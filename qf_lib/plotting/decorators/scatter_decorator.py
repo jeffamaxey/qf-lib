@@ -50,10 +50,7 @@ class ScatterDecorator(ChartDecorator, SimpleLegendItem):
         self.x_data = x_data
         self.y_data = y_data
         self.size = size
-        if color is None:
-            self.color = Chart.get_axes_colors()[0]
-        else:
-            self.color = color
+        self.color = Chart.get_axes_colors()[0] if color is None else color
         self.plot_settings = plot_settings
 
     def decorate(self, chart: "Chart"):

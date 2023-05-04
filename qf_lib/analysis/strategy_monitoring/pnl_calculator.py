@@ -50,8 +50,7 @@ class PnLCalculator:
         """
         self._data_provider = data_provider
 
-    def compute_pnl(self, ticker: Ticker, transactions: List[Transaction], start_date: datetime, end_date: datetime) \
-            -> PricesSeries:
+    def compute_pnl(self, ticker: Ticker, transactions: List[Transaction], start_date: datetime, end_date: datetime) -> PricesSeries:
         """
         Computes total PnL of a given asset between start_date and end_date. The PnL is computed every day
         at the AfterMarketCloseEvent time.
@@ -77,8 +76,9 @@ class PnLCalculator:
         """
         transactions_series = self._filter_transactions(ticker, transactions, start_date, end_date)
         prices_df = self._get_prices_df(ticker, start_date, end_date)
-        pnl_series = self._compute_pnl_for_ticker(prices_df, transactions_series, start_date, end_date)
-        return pnl_series
+        return self._compute_pnl_for_ticker(
+            prices_df, transactions_series, start_date, end_date
+        )
 
     def _get_prices_df(self, ticker: Ticker, start_date: datetime, end_date: datetime) -> PricesDataFrame:
         """ Returns non-adjusted open and close prices, indexed with the Market Open and Market Close time."""
@@ -104,8 +104,7 @@ class PnLCalculator:
 
         open_prices.index = [dt + MarketOpenEvent.trigger_time() for dt in open_prices.index]
         close_prices.index = [dt + MarketCloseEvent.trigger_time() for dt in close_prices.index]
-        prices = concat([open_prices, close_prices]).sort_index()
-        return prices
+        return concat([open_prices, close_prices]).sort_index()
 
     def _filter_transactions(self, ticker: Ticker, transactions: List[Transaction], start_date: datetime,
                              end_date: datetime) -> QFSeries:
@@ -120,9 +119,13 @@ class PnLCalculator:
             transactions_for_tickers = [t for t in transactions if ticker == t.ticker]
 
         transactions_records = [(t, t.transaction_fill_time) for t in transactions_for_tickers]
-        transactions_series = QFDataFrame.from_records(transactions_records, columns=["Transaction", "Index"]) \
-            .set_index("Index").iloc[:, 0]
-        return transactions_series
+        return (
+            QFDataFrame.from_records(
+                transactions_records, columns=["Transaction", "Index"]
+            )
+            .set_index("Index")
+            .iloc[:, 0]
+        )
 
     def _compute_pnl_for_ticker(self, prices_df: PricesDataFrame, transactions_series: QFSeries, start_date: datetime,
                                 end_date: datetime) -> PricesSeries:

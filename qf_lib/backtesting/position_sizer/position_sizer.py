@@ -120,12 +120,17 @@ class PositionSizer(metaclass=ABCMeta):
         Remove all these signals, which do not need to be passed into order factory as they obviously do not change the
         state of the portfolio (current exposure equals Exposure.OUT and suggested exposure is also Exposure.OUT).
         """
-        specific_tickers_with_open_position = set(p.ticker() for p in self._broker.get_positions())
+        specific_tickers_with_open_position = {
+            p.ticker() for p in self._broker.get_positions()
+        }
 
         def position_for_ticker_exists_in_portfolio(ticker: Ticker) -> bool:
             if isinstance(ticker, FutureTicker):
                 # Check if any of specific tickers with open positions in portfolio belongs to tickers family
-                return any([ticker.belongs_to_family(t) for t in specific_tickers_with_open_position])
+                return any(
+                    ticker.belongs_to_family(t)
+                    for t in specific_tickers_with_open_position
+                )
             else:
                 return ticker in specific_tickers_with_open_position
 
@@ -219,26 +224,31 @@ class PositionSizer(metaclass=ABCMeta):
     def _calculate_stop_price(self, signal: Signal):
         current_price = signal.last_available_price
         assert is_finite_number(current_price), f"Signal generated for the {signal.symbol} does not contain " \
-                                                f"last_available_price. In order to use the Position Sizer with " \
-                                                f"stop_losses it is necessary for the signals to contain the last " \
-                                                f"available price."
+                                                    f"last_available_price. In order to use the Position Sizer with " \
+                                                    f"stop_losses it is necessary for the signals to contain the last " \
+                                                    f"available price."
 
         price_multiplier = 1 - signal.fraction_at_risk * signal.suggested_exposure.value
         stop_price = price_multiplier * current_price
-        stop_price = self._round_stop_price(stop_price)
-        return stop_price
+        return self._round_stop_price(stop_price)
 
     def _get_existing_position_quantity(self, ticker: Ticker):
         positions = self._broker.get_positions()
-        quantity = next((position.quantity() for position in positions if position.ticker() == ticker), 0)
-        return quantity
+        return next(
+            (
+                position.quantity()
+                for position in positions
+                if position.ticker() == ticker
+            ),
+            0,
+        )
 
     def _check_for_duplicates(self, signals: List[Signal]):
         sorted_signals = sorted(signals, key=lambda signal: signal.ticker)
         for ticker, signal_group in groupby(sorted_signals, lambda signal: signal.ticker):
             signal_list = list(signal_group)
             if len(signal_list) > 1:
-                raise ValueError("More than one signal for ticker {}".format(ticker.as_string()))
+                raise ValueError(f"More than one signal for ticker {ticker.as_string()}")
 
     @staticmethod
     def _get_specific_ticker(ticker: Ticker):

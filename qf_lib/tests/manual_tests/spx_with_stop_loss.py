@@ -76,7 +76,9 @@ def run_strategy(data_provider: DataProvider) -> Tuple[float, str]:
     settings = get_test_settings()
     session_builder = BacktestTradingSessionBuilder(data_provider, settings, PDFExporter(settings),
                                                     ExcelExporter(settings))
-    session_builder.set_backtest_name('SPY w. stop ' + str(SpxWithStopLoss.percentage))
+    session_builder.set_backtest_name(
+        f'SPY w. stop {str(SpxWithStopLoss.percentage)}'
+    )
     session_builder.set_initial_cash(1000000)
     session_builder.set_frequency(Frequency.DAILY)
     session_builder.set_commission_model(IBCommissionModel)

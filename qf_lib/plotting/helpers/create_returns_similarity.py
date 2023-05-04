@@ -78,18 +78,17 @@ def create_returns_similarity(strategy: QFSeries, benchmark: QFSeries, mean_norm
 
 def _get_title(with_mean, with_std, frequency):
     if with_mean:
-        if with_std:
-            title = "Ret. Sim. w. mean & var norm."
-        else:
-            title = "Ret. Sim. w. mean normalization"
+        title = (
+            "Ret. Sim. w. mean & var norm."
+            if with_std
+            else "Ret. Sim. w. mean normalization"
+        )
+    elif with_std:
+        title = "Ret. Sim. w. var. normalization"
     else:
-        if with_std:
-            title = "Ret. Sim. w. var. normalization"
-        else:
-            title = "Returns Similarity"
+        title = "Returns Similarity"
 
-    if frequency is not None:
-        freq = str(frequency).capitalize()
-        return freq + " " + title
-    else:
+    if frequency is None:
         return title
+    freq = str(frequency).capitalize()
+    return f"{freq} {title}"

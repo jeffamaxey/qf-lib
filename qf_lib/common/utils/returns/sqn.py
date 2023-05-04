@@ -23,8 +23,7 @@ def sqn(returns: QFSeries):
     Calculates the SQN = mean return of trade / std(returns of trades). The returns passed to the function may wither
     be defined as percentage PnL of trades or as r_multiply = percentage PnL / risk.
     """
-    result = returns.mean() / returns.std()
-    return result
+    return returns.mean() / returns.std()
 
 
 def sqn_for100trades(returns: QFSeries):
@@ -40,5 +39,4 @@ def avg_nr_of_trades_per1y(trades_returns: QFSeries, start_date: datetime, end_d
     """
     period_length = end_date - start_date
     period_length_in_years = to_days(period_length) / DAYS_PER_YEAR_AVG
-    avg_number_of_trades_1y = len(trades_returns) / period_length_in_years
-    return avg_number_of_trades_1y
+    return len(trades_returns) / period_length_in_years

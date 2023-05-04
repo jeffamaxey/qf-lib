@@ -67,8 +67,7 @@ class BloombergBeapHapiFieldsProvider:
         }
 
         self.logger.info('Field list component payload:\n %s', pprint.pformat(fieldlist_payload))
-        fieldlist_url = self._get_fields_list_common(fieldlist_id, fieldlist_payload)
-        return fieldlist_url
+        return self._get_fields_list_common(fieldlist_id, fieldlist_payload)
 
     def get_fields_history_url(self, fieldlist_id: str, fields: Union[str, Sequence[str]]) -> str:
         """
@@ -97,11 +96,10 @@ class BloombergBeapHapiFieldsProvider:
             'contains': cont
         }
         self.logger.info('Field list component payload:\n %s', pprint.pformat(fieldlist_payload))
-        fieldlist_url = self._get_fields_list_common(fieldlist_id, fieldlist_payload)
-        return fieldlist_url
+        return self._get_fields_list_common(fieldlist_id, fieldlist_payload)
 
     def _get_fields_list_common(self, fieldlist_id, fieldlist_payload) -> str:
-        fieldlist_url = urljoin(self.account_url, 'fieldLists/{}/'.format(fieldlist_id))
+        fieldlist_url = urljoin(self.account_url, f'fieldLists/{fieldlist_id}/')
 
         # check if already exists, if not then post
         response = self.session.get(fieldlist_url)

@@ -31,5 +31,4 @@ def log_to_simple_return(log_return: float) -> float:
 
     """
 
-    simple_return = np.exp(log_return) - 1
-    return simple_return
+    return np.exp(log_return) - 1

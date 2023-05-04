@@ -33,6 +33,7 @@ def get_grouping_for_frequency(frequency):
     elif frequency == Frequency.YEARLY:
         grouping = [lambda x: x.year]
     else:
-        raise ValueError('convert_to must be {}, {}, {} or {}'.format(
-            Frequency.DAILY, Frequency.WEEKLY, Frequency.MONTHLY, Frequency.YEARLY))
+        raise ValueError(
+            f'convert_to must be {Frequency.DAILY}, {Frequency.WEEKLY}, {Frequency.MONTHLY} or {Frequency.YEARLY}'
+        )
     return grouping

@@ -47,8 +47,7 @@ def rand_recession(series):
         current_length += period_length
         is_recession = not is_recession
 
-    recession_tms = QFSeries(data=recession_data, index=series.index.copy())
-    return recession_tms
+    return QFSeries(data=recession_data, index=series.index.copy())
 
 
 def main():

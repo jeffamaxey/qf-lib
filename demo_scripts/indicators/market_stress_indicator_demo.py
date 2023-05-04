@@ -50,7 +50,7 @@ def main():
     # stress_indicator_tms = cached_value(_get_indicator, indicator_cache_path)  # type: QFSeries
 
     fig_size = (10, 5)
-    title = "Stress Indicator US {}Y rolling".format(years_rolling)
+    title = f"Stress Indicator US {years_rolling}Y rolling"
     chart = create_line_chart([stress_indicator_tms], ['Stress Indicator'], title)
     chart.plot(figsize=fig_size)
 

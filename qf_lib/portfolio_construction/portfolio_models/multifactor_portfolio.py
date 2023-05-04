@@ -71,8 +71,9 @@ class MultiFactorPortfolio(Portfolio):
 
         min_upper_constrain = (1/len(q)) * 1.3  # 30% above 1/N
         if self.upper_constraint is not None and self.upper_constraint < min_upper_constrain:
-            self.logger.warning("MQP upper allocation constraint to tight,"
-                                " changing max upper allocation to {}".format(min_upper_constrain))
+            self.logger.warning(
+                f"MQP upper allocation constraint to tight, changing max upper allocation to {min_upper_constrain}"
+            )
             weights = QuadraticOptimizer.get_optimal_weights(P.values, q, upper_constraints=min_upper_constrain)
         else:
             weights = QuadraticOptimizer.get_optimal_weights(P.values, q, upper_constraints=self.upper_constraint)
@@ -148,8 +149,7 @@ class MultiFactorPortfolio_new(Portfolio):
 
         # run optimisation
         weights = QuadraticOptimizer.get_optimal_weights(P.values, q.values, upper_constraints=self.upper_constraint)
-        stocks_weights = QFSeries(data=weights, index=P.columns)
-        return stocks_weights
+        return QFSeries(data=weights, index=P.columns)
 
     def _get_equal_weights(self):
         n = self.mean_return.size

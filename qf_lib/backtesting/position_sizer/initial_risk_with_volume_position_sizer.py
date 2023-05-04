@@ -65,20 +65,21 @@ class InitialRiskWithVolumePositionSizer(InitialRiskPositionSizer):
         super().__init__(broker, data_provider, order_factory, signals_register, initial_risk, max_target_percentage,
                          tolerance_percentage)
 
-        self._cached_futures_chains_dict: Dict[FutureTicker, FuturesChain] = dict()
+        self._cached_futures_chains_dict: Dict[FutureTicker, FuturesChain] = {}
         self._max_volume_percentage = max_volume_percentage
 
-    def _generate_market_orders(self, signals: List[Signal], time_in_force: TimeInForce, frequency: Frequency = None) \
-            -> List[Optional[Order]]:
+    def _generate_market_orders(self, signals: List[Signal], time_in_force: TimeInForce, frequency: Frequency = None) -> List[Optional[Order]]:
         target_values = {
             self._get_specific_ticker(signal.ticker): self._compute_target_value(signal) for signal in signals
         }
 
-        market_order_list = self._order_factory.target_value_orders(
-            target_values, MarketOrder(), time_in_force, self.tolerance_percentage, frequency
+        return self._order_factory.target_value_orders(
+            target_values,
+            MarketOrder(),
+            time_in_force,
+            self.tolerance_percentage,
+            frequency,
         )
-
-        return market_order_list
 
     def _compute_target_value(self, signal: Signal, frequency=Frequency.DAILY) -> float:
         """
@@ -125,9 +126,8 @@ class InitialRiskWithVolumePositionSizer(InitialRiskPositionSizer):
                 target_quantity = float(np.floor(mean_volume * self._max_volume_percentage))
             target_value = target_quantity * divisor * np.sign(quantity)
             self.logger.info(
-                "InitialRiskWithVolumePositionSizer: capping {}.\n"
-                "Initial quantity: {}\n"
-                "Reduced quantity: {}".format(ticker.ticker, quantity, target_quantity))
+                f"InitialRiskWithVolumePositionSizer: capping {ticker.ticker}.\nInitial quantity: {quantity}\nReduced quantity: {target_quantity}"
+            )
 
         assert is_finite_number(target_value), "target_value has to be a finite number"
         return target_value

@@ -32,7 +32,7 @@ class InSampleReturnStats:
         self.std_of_log_ret = std_of_log_ret
 
     def __str__(self):
-        return "mean log return: {}, std of log returns: {}".format(self.mean_log_ret, self.std_of_log_ret)
+        return f"mean log return: {self.mean_log_ret}, std of log returns: {self.std_of_log_ret}"
 
     @staticmethod
     def get_stats_from_tms(series: QFSeries):

@@ -98,7 +98,7 @@ class BacktestTradingSessionBuilder:
         self._slippage_model_kwargs = {"slippage_rate": 0.0, "max_volume_share_limit": None}
 
         self._position_sizer_type = SimplePositionSizer
-        self._position_sizer_kwargs = dict()
+        self._position_sizer_kwargs = {}
 
         self._orders_filter_types_params = []  # type: List[Tuple[Type[OrdersFilter], Dict]]
 
@@ -127,7 +127,7 @@ class BacktestTradingSessionBuilder:
         name: str
             new backtest name
         """
-        assert not any(char in name for char in '/\\?%*:|"<>')
+        assert all(char not in name for char in '/\\?%*:|"<>')
         self._backtest_name = name
 
     @ConfigExporter.update_config
@@ -242,9 +242,10 @@ class BacktestTradingSessionBuilder:
         monitor_settings:
             object defining the outputs that we want the BacktestMonitor to generate
         """
-        if not type(monitor_settings) is BacktestMonitorSettings:
-            self._logger.error("Monitor settings of different type "
-                               "than BacktestMonitorSettings: {}".format(monitor_settings))
+        if type(monitor_settings) is not BacktestMonitorSettings:
+            self._logger.error(
+                f"Monitor settings of different type than BacktestMonitorSettings: {monitor_settings}"
+            )
         else:
             self._monitor_settings = monitor_settings
 
@@ -270,16 +271,15 @@ class BacktestTradingSessionBuilder:
             all keyword parameters necessary to initialize the chosen commission model
         """
         try:
-            # Verify if all required parameters were passed to the function. All the parameters that are necessary for
-            # the CommissionModel constructor will be passed along with the kwargs
-            commission_model_params = dict(inspect.signature(CommissionModel).parameters)
-            commission_model_params.update(kwargs)
+            commission_model_params = (
+                dict(inspect.signature(CommissionModel).parameters) | kwargs
+            )
             inspect.signature(commission_model_type).bind(**commission_model_params)
 
             self._commission_model_type = commission_model_type
             self._commission_model_kwargs = kwargs
         except TypeError as e:
-            self._logger.error("The Commission Model could not be set correctly - {}".format(e))
+            self._logger.error(f"The Commission Model could not be set correctly - {e}")
 
     @ConfigExporter.update_config
     def set_slippage_model(self, slippage_model_type: Type[Slippage], **kwargs):
@@ -297,16 +297,13 @@ class BacktestTradingSessionBuilder:
             all keyword parameters which are necessary to initialize the chosen slippage model
         """
         try:
-            # Verify if all required parameters were passed to the function. All the parameters that are necessary for
-            # the Slippage constructor will be passed along with the kwargs
-            slippage_model_params = dict(inspect.signature(Slippage).parameters)
-            slippage_model_params.update(kwargs)
+            slippage_model_params = dict(inspect.signature(Slippage).parameters) | kwargs
             inspect.signature(slippage_model_type).bind(**slippage_model_params)
 
             self._slippage_model_type = slippage_model_type
             self._slippage_model_kwargs = kwargs
         except TypeError as e:
-            self._logger.error("The Slippage Model could not be set correctly - {}".format(e))
+            self._logger.error(f"The Slippage Model could not be set correctly - {e}")
 
     @ConfigExporter.update_config
     def set_position_sizer(self, position_sizer_type: Type[PositionSizer], **kwargs):
@@ -326,16 +323,15 @@ class BacktestTradingSessionBuilder:
             all keyword parameters which are necessary to initialize the chosen position sizer
         """
         try:
-            # Verify if all required parameters were passed to the function. All the parameters that are necessary for
-            # the PositionSizer constructor will be passed along with the kwargs
-            position_sizer_params = dict(inspect.signature(PositionSizer).parameters)
-            position_sizer_params.update(kwargs)
+            position_sizer_params = (
+                dict(inspect.signature(PositionSizer).parameters) | kwargs
+            )
             inspect.signature(position_sizer_type).bind(**position_sizer_params)
 
             self._position_sizer_type = position_sizer_type
             self._position_sizer_kwargs = kwargs
         except TypeError as e:
-            self._logger.error("The Position Sizer could not be set correctly - {}".format(e))
+            self._logger.error(f"The Position Sizer could not be set correctly - {e}")
 
     @ConfigExporter.append_config
     def add_orders_filter(self, orders_filter_type: Type[OrdersFilter], **kwargs):
@@ -354,14 +350,15 @@ class BacktestTradingSessionBuilder:
             all keyword parameters which are necessary to initialize the chosen orders filter
         """
         try:
-            # Verify if all required parameters were passed to the function. All the parameters that are necessary for
-            # the OrdersFilter constructor will be passed along with the kwargs
-            orders_filter_params = dict(inspect.signature(OrdersFilter).parameters)
-            orders_filter_params.update(kwargs)
+            orders_filter_params = (
+                dict(inspect.signature(OrdersFilter).parameters) | kwargs
+            )
             inspect.signature(orders_filter_type).bind(**orders_filter_params)
             self._orders_filter_types_params.append((orders_filter_type, kwargs))
         except TypeError as e:
-            self._logger.error("The Orders Filter could not be added to the pipeline - {}".format(e))
+            self._logger.error(
+                f"The Orders Filter could not be added to the pipeline - {e}"
+            )
 
     @staticmethod
     def _create_event_manager(timer, notifiers: Notifiers):
@@ -433,15 +430,17 @@ class BacktestTradingSessionBuilder:
         self._orders_filters = self._orders_filter_setup()
 
         self._logger.info(
-            "\n".join([
-                "Creating Backtest Trading Session.",
-                "\tBacktest Name: {}".format(self._backtest_name),
-                "\tData Provider: {}".format(self._data_provider.__class__.__name__),
-                "\tStart Date: {}".format(start_date),
-                "\tEnd Date: {}".format(end_date),
-                "\tTrading frequency:{}".format(self._frequency),
-                "\tInitial Cash: {:.2f}".format(self._initial_cash)
-            ])
+            "\n".join(
+                [
+                    "Creating Backtest Trading Session.",
+                    f"\tBacktest Name: {self._backtest_name}",
+                    f"\tData Provider: {self._data_provider.__class__.__name__}",
+                    f"\tStart Date: {start_date}",
+                    f"\tEnd Date: {end_date}",
+                    f"\tTrading frequency:{self._frequency}",
+                    "\tInitial Cash: {:.2f}".format(self._initial_cash),
+                ]
+            )
         )
 
         self._logger.info(
@@ -468,7 +467,7 @@ class BacktestTradingSessionBuilder:
                                "Call set_market_open_and_close_time(...) before building the session")
             raise ex
 
-        ts = BacktestTradingSession(
+        return BacktestTradingSession(
             contract_ticker_mapper=self._contract_ticker_mapper,
             start_date=start_date,
             end_date=end_date,
@@ -483,15 +482,18 @@ class BacktestTradingSessionBuilder:
             broker=self._broker,
             order_factory=self._order_factory,
             frequency=self._frequency,
-            backtest_result=self._backtest_result
+            backtest_result=self._backtest_result,
         )
 
-        return ts
-
     def _monitor_setup(self) -> BacktestMonitor:
-        monitor = BacktestMonitor(self._backtest_result, self._settings, self._pdf_exporter,
-                                  self._excel_exporter, self._monitor_settings, self._benchmark_tms)
-        return monitor
+        return BacktestMonitor(
+            self._backtest_result,
+            self._settings,
+            self._pdf_exporter,
+            self._excel_exporter,
+            self._monitor_settings,
+            self._benchmark_tms,
+        )
 
     def _position_sizer_setup(self, signals_register: SignalsRegister):
         return self._position_sizer_type(

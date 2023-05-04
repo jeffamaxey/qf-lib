@@ -277,8 +277,7 @@ class DataProvider(object, metaclass=ABCMeta):
 
             latest_available_prices.append(price)
 
-        latest_available_prices_series = PricesSeries(data=latest_available_prices, index=tickers)
-        return latest_available_prices_series
+        return PricesSeries(data=latest_available_prices, index=tickers)
 
     @staticmethod
     def _compute_start_date(nr_of_bars_needed: int, end_date: datetime, frequency: Frequency):
@@ -294,10 +293,9 @@ class DataProvider(object, metaclass=ABCMeta):
         if end_date.weekday() in (0, 5, 6):
             end_date = end_date - RelativeDelta(weeks=1, weekday=5, hour=0, minute=0, microsecond=0)
 
-        # Remove the time part and leave only days in order to align the start date to match the market open time
-        # in case of intraday data, e.g. if the market opens at 13:30, the bars will also start at 13:30
-        start_date = end_date - RelativeDelta(days=nr_of_days_to_go_back, hour=0, minute=0, second=0, microsecond=0)
-        return start_date
+        return end_date - RelativeDelta(
+            days=nr_of_days_to_go_back, hour=0, minute=0, second=0, microsecond=0
+        )
 
     def _adjust_start_date(self, start_date: datetime, frequency: Frequency):
         if frequency > Frequency.DAILY:

@@ -133,6 +133,6 @@ class AbstractTearsheet(AbstractDocument, metaclass=ABCMeta):
             file_name = datetime.now().strftime(file_name)
 
         if not file_name.endswith(".pdf"):
-            file_name = "{}.pdf".format(file_name)
+            file_name = f"{file_name}.pdf"
 
         return self.pdf_exporter.generate([self.document], report_dir, file_name)

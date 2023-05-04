@@ -56,12 +56,8 @@ class PricesSeries(QFSeries):
         returns = rets.iloc[1:]
         return SimpleReturnsSeries(index=dates, data=returns).__finalize__(self)
 
-    def to_prices(self, initial_price: float = None, suggested_initial_date: datetime = None, frequency=None) \
-            -> ["PricesSeries"]:
-        if initial_price is None:
-            return self.copy()
-
-        return self / self[0] * initial_price
+    def to_prices(self, initial_price: float = None, suggested_initial_date: datetime = None, frequency=None) -> ["PricesSeries"]:
+        return self.copy() if initial_price is None else self / self[0] * initial_price
 
     def total_cumulative_return(self) -> float:
         return self.values[-1] / self.values[0] - 1.0

@@ -95,7 +95,7 @@ def check_event_for_errors(event):
     first_msg = blpapi.event.MessageIterator(event).next()
 
     if first_msg.asElement().hasElement(RESPONSE_ERROR):
-        error_message = "Response error: " + str(first_msg.asElement())
+        error_message = f"Response error: {str(first_msg.asElement())}"
         raise BloombergError(error_message)
 
 

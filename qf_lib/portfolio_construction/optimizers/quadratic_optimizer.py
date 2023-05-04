@@ -55,16 +55,8 @@ class QuadraticOptimizer:
             best weights for the given problem. Sum of all weights is equal 1.
         """
         assets_number = P.shape[0]
-        if P is not None:
-            P = matrix(P)
-        else:
-            P = matrix(0.0, (assets_number, assets_number))
-
-        if q is not None:
-            q = matrix(q)
-        else:
-            q = matrix(0.0, (assets_number, 1))
-
+        P = matrix(P) if P is not None else matrix(0.0, (assets_number, assets_number))
+        q = matrix(q) if q is not None else matrix(0.0, (assets_number, 1))
         A, b = constr.sum_weights_equal_1_constraint(assets_number)
         G, h = constr.each_weight_greater_than_0_constraint(assets_number)
 

@@ -74,8 +74,7 @@ class FuturesModel(AlphaModel, metaclass=abc.ABCMeta):
         self.num_of_bars_atr = num_of_bars_needed
         self.supported_frequency = Frequency.DAILY
 
-    def get_signal(self, ticker: Ticker, current_exposure: Exposure, current_time: datetime, frequency: Frequency)\
-            -> Signal:
+    def get_signal(self, ticker: Ticker, current_exposure: Exposure, current_time: datetime, frequency: Frequency) -> Signal:
         assert self.supported_frequency == frequency, "Only frequency.DAILY is supported for the moment"
         self.ticker_name_to_ticker[ticker.name] = ticker
         suggested_exposure = self.calculate_exposure(ticker, current_exposure, current_time, frequency)
@@ -84,9 +83,14 @@ class FuturesModel(AlphaModel, metaclass=abc.ABCMeta):
         specific_ticker = ticker.get_current_specific_ticker() if isinstance(ticker, FutureTicker) else ticker
         last_available_price = self.data_provider.get_last_available_price(specific_ticker, frequency, current_time)
 
-        signal = Signal(ticker, suggested_exposure, fraction_at_risk, last_available_price, current_time,
-                        alpha_model=self)
-        return signal
+        return Signal(
+            ticker,
+            suggested_exposure,
+            fraction_at_risk,
+            last_available_price,
+            current_time,
+            alpha_model=self,
+        )
 
     def get_data(self, ticker_str: str, end_date: datetime, frequency: Frequency, aggregate_volume: bool = False):
         """
@@ -143,7 +147,7 @@ class FuturesModel(AlphaModel, metaclass=abc.ABCMeta):
         volume_df = self.data_provider.get_price(all_specific_tickers, PriceField.Volume, start_date, end_date,
                                                  frequency).dropna(axis=1, how="all").fillna(0)
 
-        return volume_df.sum(axis=1) if not volume_df.empty else None
+        return None if volume_df.empty else volume_df.sum(axis=1)
 
     def compute_atr(self, prices_df: PricesDataFrame):
         try:

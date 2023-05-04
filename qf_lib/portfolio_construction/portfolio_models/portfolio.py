@@ -136,8 +136,7 @@ class Portfolio(metaclass=abc.ABCMeta):
         return portfolio_rets, allocation_df
 
     @classmethod
-    def different_allocations_tms(cls, assets_rets_df: SimpleReturnsDataFrame, allocations_df: QFDataFrame) \
-            -> SimpleReturnsSeries:
+    def different_allocations_tms(cls, assets_rets_df: SimpleReturnsDataFrame, allocations_df: QFDataFrame) -> SimpleReturnsSeries:
         """
         Calculates the time series of portfolio returns given the allocations on each date. The portfolio returns
         are calculated by multiplying returns of assets by corresponding allocations' values.
@@ -155,9 +154,9 @@ class Portfolio(metaclass=abc.ABCMeta):
             timeseries of portfolio's returns
         """
         assert np.all(assets_rets_df.columns.values == allocations_df.columns.values), \
-            "Different column values for assets and allocation matrix"
+                "Different column values for assets and allocation matrix"
         assert np.all(assets_rets_df.index.values == allocations_df.index.values), \
-            "Different dates for assets and allocation matrix"
+                "Different dates for assets and allocation matrix"
 
         # get indices of rows for which: sum of weights is greater than 1. The result of where is a tuple (for a vector
         # it's a 1-element tuple, for a matrix -- a 2-element tuple and so on). Thus it's necessary to unwrap the result
@@ -168,13 +167,15 @@ class Portfolio(metaclass=abc.ABCMeta):
             dates = allocations_df.index.values[incorrect_weights_rows]
             dates_str = ", ".join([date_to_str(date) for date in dates])
 
-            cls.logger().warning("Weights don't sum up to 1 for the following dates: " + dates_str)
+            cls.logger().warning(
+                f"Weights don't sum up to 1 for the following dates: {dates_str}"
+            )
 
         scaled_returns = assets_rets_df * allocations_df  # type: np.ndarray
         portfolio_rets = scaled_returns.sum(axis=1)
-        portfolio_rets_tms = SimpleReturnsSeries(data=portfolio_rets, index=allocations_df.index.copy())
-
-        return portfolio_rets_tms
+        return SimpleReturnsSeries(
+            data=portfolio_rets, index=allocations_df.index.copy()
+        )
 
     @classmethod
     def one_over_n_weights(cls, tickers: Sequence[Ticker]) -> QFSeries:
@@ -185,6 +186,4 @@ class Portfolio(metaclass=abc.ABCMeta):
         weight_of_each_asset = 1 / num_of_tickers
 
         weights_values = [weight_of_each_asset] * num_of_tickers
-        weights = QFSeries(index=pd.Index(tickers, name=TICKERS), data=weights_values)
-
-        return weights
+        return QFSeries(index=pd.Index(tickers, name=TICKERS), data=weights_values)

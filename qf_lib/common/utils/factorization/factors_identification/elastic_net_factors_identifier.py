@@ -203,9 +203,7 @@ class ElasticNetFactorsIdentifier(FactorsIdentifier):
         alphas_within_the_limit = alphas[mean_square_errors < max_mse_limit]
         alpha_1se = np.max(alphas_within_the_limit)
 
-        # np.argmax finds the index of first True occurrence in bool array (in this case)
-        index_of_alpha_1se = np.argmax(alphas == alpha_1se)  # type: int
-        return index_of_alpha_1se
+        return np.argmax(alphas == alpha_1se)
 
     def _number_of_non_zero_coefficients(self, coefficients_vector):
         coefficients_greater_than_epsilon = np.abs(coefficients_vector) > self.epsilon  # type: np.ndarray

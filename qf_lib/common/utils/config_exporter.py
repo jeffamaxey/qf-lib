@@ -21,7 +21,7 @@ class ConfigExporter:
 
             function_name = func.__name__
             args_dict = dict(inspect.signature(func).bind_partial(*args).arguments)
-            arguments_dict = {**args_dict, **kwargs}
+            arguments_dict = args_dict | kwargs
 
             object_for_func = arguments_dict.pop('self', None)
             function_origin = object_for_func.__class__.__name__ if object_for_func is not None else func.__module__
@@ -45,7 +45,7 @@ class ConfigExporter:
 
             function_name = func.__name__
             args_dict = dict(inspect.signature(func).bind_partial(*args).arguments)
-            arguments_dict = {**args_dict, **kwargs}
+            arguments_dict = args_dict | kwargs
 
             object_for_func = arguments_dict.pop('self', None)
             function_origin = object_for_func.__class__.__name__ if object_for_func is not None else func.__module__

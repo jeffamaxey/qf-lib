@@ -53,7 +53,7 @@ class ChartElement(Element):
         """
         super().__init__(grid_proportion)
         self._chart = chart
-        self._filename = "{}.png".format(uuid.uuid4())
+        self._filename = f"{uuid.uuid4()}.png"
         self.figsize = figsize
         self.dpi = dpi
         self.optimise = optimise
@@ -74,10 +74,9 @@ class ChartElement(Element):
         A string with the base64 image (with encoding prefix) of the chart.
         """
         try:
-            result = "data:image/png;base64," + self._chart.render_as_base64_image(
-                self.figsize, self.dpi, self.optimise)
+            result = f"data:image/png;base64,{self._chart.render_as_base64_image(self.figsize, self.dpi, self.optimise)}"
         except Exception as ex:
-            error_message = "{}\n{}".format(ex.__class__.__name__, traceback.format_exc())
+            error_message = f"{ex.__class__.__name__}\n{traceback.format_exc()}"
             self.logger.exception('Chart generation error:')
             self.logger.exception(error_message)
             result = error_message
@@ -97,7 +96,7 @@ class ChartElement(Element):
             result = template.render(data=base64, width="100%")
 
         except Exception as ex:
-            error_message = "{}\n{}".format(ex.__class__.__name__, traceback.format_exc())
+            error_message = f"{ex.__class__.__name__}\n{traceback.format_exc()}"
             self.logger.exception('Chart generation error:')
             self.logger.exception(error_message)
             result = "<h2 class='chart-render-failure'>Failed to render chart</h1>"

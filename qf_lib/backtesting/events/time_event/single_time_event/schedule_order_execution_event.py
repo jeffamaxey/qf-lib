@@ -37,7 +37,7 @@ class ScheduleOrderExecutionEvent(SingleTimeEvent):
         Multiple events can be scheduled for the same time - the orders and order executors will be appended to
         existing data.
         """
-        for order_executor in executor_to_orders_dict.keys():
+        for order_executor in executor_to_orders_dict:
             cls._datetimes_to_data[date_time][order_executor].extend(executor_to_orders_dict[order_executor])
 
     def notify(self, listener) -> None:

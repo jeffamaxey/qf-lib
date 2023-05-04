@@ -64,13 +64,9 @@ class TradesGenerator:
             for p in positions
         ]
 
-        if got_single_position:
-            return trades[0]
-        else:
-            return trades
+        return trades[0] if got_single_position else trades
 
-    def create_trades_from_transactions(self, transactions: Sequence, portfolio_values: Optional[QFSeries] = None) \
-            -> Sequence[Trade]:
+    def create_trades_from_transactions(self, transactions: Sequence, portfolio_values: Optional[QFSeries] = None) -> Sequence[Trade]:
         """
         Generates trades based on a series of Transactions.
 
@@ -105,9 +101,7 @@ class TradesGenerator:
 
         trades_series = transactions_df.groupby(by=["position start"])["transaction"].apply(
             lambda t: self._parse_position(t, portfolio_values))
-        trades = trades_series.sort_index(level=1).tolist()
-
-        return trades
+        return trades_series.sort_index(level=1).tolist()
 
     def _parse_position(self, transactions: QFSeries, portfolio_values: Optional[QFSeries]) -> QFSeries:
         """

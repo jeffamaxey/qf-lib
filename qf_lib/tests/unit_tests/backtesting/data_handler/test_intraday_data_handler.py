@@ -808,14 +808,14 @@ class TestIntradayDataHandler(TestCase):
 
         def get_last_available_price(t, freq, end_time: datetime = None):
             open_prices = mock_data_array.loc[:, t, PriceField.Open].to_pandas()
-            open_prices.index = [ind for ind in open_prices.index]
+            open_prices.index = list(open_prices.index)
             close_prices = mock_data_array.loc[:, t, PriceField.Close].to_pandas()
             close_prices.index = [ind + freq.time_delta() + RelativeDelta(microseconds=-1) for ind in close_prices.index]
             prices = PricesDataFrame(concat([open_prices, close_prices])).sort_index().ffill()
 
             end_date = end_time + RelativeDelta(second=0, microsecond=0)
             prices = prices.loc[:end_date + freq.time_delta() + RelativeDelta(microseconds=-1)]
-            return prices.iloc[-1] if not prices.empty else PricesSeries(index=t, data=nan)
+            return PricesSeries(index=t, data=nan) if prices.empty else prices.iloc[-1]
 
         price_data_provider_mock = Mock(spec=DataProvider, frequency=frequency)
         price_data_provider_mock.get_price.side_effect = get_price

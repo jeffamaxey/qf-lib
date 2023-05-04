@@ -50,8 +50,7 @@ class RiskContributionAnalysis:
 
         risk_contribution = weigths_of_assets * volatility_of_returns * correlation_asset_portfolio
 
-        normalized_risk_contribution_msci = risk_contribution / risk_contribution.sum()
-        return normalized_risk_contribution_msci
+        return risk_contribution / risk_contribution.sum()
 
     @classmethod
     def get_risk_contribution_optimised(
@@ -72,9 +71,9 @@ class RiskContributionAnalysis:
         """
 
         assets_covariance = assets_rets.cov()
-        risk_contribution = cls._get_normalized_risk_contribution(assets_covariance, weights_of_assets)
-
-        return risk_contribution
+        return cls._get_normalized_risk_contribution(
+            assets_covariance, weights_of_assets
+        )
 
     @classmethod
     def get_distance_to_equal_risk_contrib(
@@ -137,5 +136,4 @@ class RiskContributionAnalysis:
     def _get_normalized_risk_contribution(
             cls, assets_returns_covariance: QFDataFrame, weights_of_factors: QFSeries) -> QFSeries:
         raw_risk_contribution = weights_of_factors * (assets_returns_covariance.dot(weights_of_factors))
-        normalized_risk_contrib = raw_risk_contribution / raw_risk_contribution.sum()
-        return normalized_risk_contrib
+        return raw_risk_contribution / raw_risk_contribution.sum()

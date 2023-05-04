@@ -128,8 +128,7 @@ class SimpleFuturesModel(AlphaModel):
         return current_exposure
 
     def _atr_fraction_at_risk(self, ticker, time_period, current_time, frequency):
-        fraction_at_risk = self.average_true_range * self.risk_estimation_factor
-        return fraction_at_risk
+        return self.average_true_range * self.risk_estimation_factor
 
     def __hash__(self):
         return hash((self.__class__.__name__, self.fast_time_period, self.slow_time_period, self.risk_estimation_factor))

@@ -27,7 +27,13 @@ from qf_lib.starting_dir import get_starting_dir_abs_path
 def setup_logging(level, console_logging=True, log_dir=None, log_file_base_name="", logger_name: str = 'qf'):
     if logger_name not in loggers.keys():
         raise KeyError(f'{logger_name}_logger is not available. Please add it to loggers.')
-    _inner_setup_logging(loggers[logger_name], level, console_logging, log_dir, "QF_" + log_file_base_name)
+    _inner_setup_logging(
+        loggers[logger_name],
+        level,
+        console_logging,
+        log_dir,
+        f"QF_{log_file_base_name}",
+    )
 
 
 def _inner_setup_logging(logger, level, console_logging, log_dir, log_file_base_name):

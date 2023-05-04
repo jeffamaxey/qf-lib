@@ -48,10 +48,7 @@ class MovingAverageAlphaModel(AlphaModel):
         fast_ma = close_tms.ewm(span=self.fast_time_period, adjust=False).mean()  # fast exponential moving average
         slow_ma = close_tms.ewm(span=self.slow_time_period, adjust=False).mean()  # slow exponential moving average
 
-        if fast_ma[-1] > slow_ma[-1]:
-            return Exposure.LONG
-        else:
-            return Exposure.SHORT
+        return Exposure.LONG if fast_ma[-1] > slow_ma[-1] else Exposure.SHORT
 
     def __hash__(self):
         return hash((self.__class__.__name__, self.fast_time_period, self.slow_time_period, self.risk_estimation_factor))

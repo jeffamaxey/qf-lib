@@ -98,9 +98,14 @@ class EmailPublisher:
             template_content = file.read()
             file.close()
 
-        message = emails.Message(
-            mail_from=mail_from, mail_to=mail_to, cc=cc, bcc=bcc, subject=T(subject), html=T(template_content))
-        return message
+        return emails.Message(
+            mail_from=mail_from,
+            mail_to=mail_to,
+            cc=cc,
+            bcc=bcc,
+            subject=T(subject),
+            html=T(template_content),
+        )
 
     def _add_attachments(self, attachments, message):
         for file_path in attachments:
@@ -112,19 +117,14 @@ class EmailPublisher:
         log_info_strings = []
         if attachments:
             log_info_strings.append("Files sent:")
-            for attachment in attachments:
-                log_info_strings.append("--> {}".format(attachment))
+            log_info_strings.extend(f"--> {attachment}" for attachment in attachments)
         if mail_to:
             log_info_strings.append("Mail receipents: ")
-            for receipent in list(mail_to):
-                log_info_strings.append("--> {}".format(receipent))
+            log_info_strings.extend(f"--> {receipent}" for receipent in list(mail_to))
         if cc:
             log_info_strings.append("CC recepients: ")
-            for receipent in list(cc):
-                log_info_strings.append("--> {}".format(receipent))
+            log_info_strings.extend(f"--> {receipent}" for receipent in list(cc))
         if bcc:
             log_info_strings.append("BCC recepients: ")
-            for receipent in list(bcc):
-                log_info_strings.append("--> {}".format(receipent))
-
+            log_info_strings.extend(f"--> {receipent}" for receipent in list(bcc))
         self.logger.info("\n".join(log_info_strings))

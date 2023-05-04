@@ -40,6 +40,6 @@ def cached_value(func: Callable[[], Any], path) -> Any:
 
         except CachedValueException:
             logger = qf_logger.getChild(__name__)
-            logger.error('Error while processing {}'.format(func))
+            logger.error(f'Error while processing {func}')
 
     return result

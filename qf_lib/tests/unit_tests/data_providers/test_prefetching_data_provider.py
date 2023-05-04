@@ -60,7 +60,7 @@ class TestPrefetchingDataProvider(unittest.TestCase):
             tickers=self.cached_tickers,
             fields=self.cached_fields
         )
-        data_provider.get_futures_chain_tickers.return_value = dict()
+        data_provider.get_futures_chain_tickers.return_value = {}
         return data_provider
 
     def test_get_price_with_single_ticker(self):

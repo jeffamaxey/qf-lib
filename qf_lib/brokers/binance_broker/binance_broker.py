@@ -130,7 +130,10 @@ class BinanceBroker(Broker):
             return []
 
         tickers = [order.ticker for order in orders]
-        if not all([ticker.quote_ccy == self.contract_ticker_mapper.quote_ccy for ticker in tickers]):
+        if any(
+            ticker.quote_ccy != self.contract_ticker_mapper.quote_ccy
+            for ticker in tickers
+        ):
             raise ValueError(f'Not all tickers are expressed in the same quote currency. '
                              f'Expected quote currency:  {self.contract_ticker_mapper.quote_ccy}')
 

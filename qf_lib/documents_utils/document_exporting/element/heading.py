@@ -35,7 +35,7 @@ class HeadingElement(Element):
         super().__init__(grid_proportion)
         self.level = level
         self.text = text
-        self.id = "heading_" + str(uuid.uuid4())
+        self.id = f"heading_{str(uuid.uuid4())}"
 
     def generate_html(self, document: Document) -> str:
         """

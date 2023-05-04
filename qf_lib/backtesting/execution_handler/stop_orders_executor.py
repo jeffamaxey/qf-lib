@@ -82,10 +82,8 @@ class StopOrdersExecutor(SimulatedExecutor):
                 if no_slippage_fill_price is not None:
                     to_be_executed_orders.append(order)
                     no_slippage_fill_prices_list.append(no_slippage_fill_price)
-                else:
-                    # the Order cannot be executed
-                    if self._order_expires(order):
-                        expired_stop_orders.append(order.id)
+                elif self._order_expires(order):
+                    expired_stop_orders.append(order.id)
         else:
             for order, ticker in zip(open_orders_list, tickers):
                 current_bar = current_bars_df.loc[ticker, :]
@@ -113,18 +111,15 @@ class StopOrdersExecutor(SimulatedExecutor):
             return QFDataFrame(columns=PriceField.ohlcv())
 
         assert self._frequency >= Frequency.DAILY, "Lower than daily frequency is not supported by the simulated " \
-                                                   "executor"
+                                                       "executor"
         current_datetime = self._timer.now()
-        market_close_time = current_datetime + MarketCloseEvent.trigger_time() == current_datetime
-
         if self._frequency == Frequency.DAILY:
-            # In case of daily trading we want the Stop Orders to be "executed" on the market close, so before that
-            # no data should be returned
+            market_close_time = current_datetime + MarketCloseEvent.trigger_time() == current_datetime
+
             if not market_close_time:
                 return QFDataFrame(index=tickers, columns=PriceField.ohlcv())
-            else:
-                current_datetime = date_to_datetime(current_datetime.date())
-                start_date = current_datetime
+            current_datetime = date_to_datetime(current_datetime.date())
+            start_date = current_datetime
         else:
             # In case of intraday trading the current full bar is always indexed by the left side of the time range
             start_date = current_datetime - self._frequency.time_delta()
@@ -150,26 +145,28 @@ class StopOrdersExecutor(SimulatedExecutor):
         is_sell_stop = order.quantity < 0
         no_slippage_fill_price = None
 
-        if is_sell_stop:
-            if open_price <= stop_price:
-                no_slippage_fill_price = open_price
-            else:
-                if low_price <= stop_price:
-                    no_slippage_fill_price = stop_price
-        else:  # is buy stop
-            if open_price >= stop_price:
-                no_slippage_fill_price = open_price
-            else:
-                if high_price >= stop_price:
-                    no_slippage_fill_price = stop_price
-
+        if (
+            is_sell_stop
+            and open_price > stop_price
+            and low_price <= stop_price
+            or not is_sell_stop
+            and open_price < stop_price
+            and high_price >= stop_price
+        ):
+            no_slippage_fill_price = stop_price
+        elif (not is_sell_stop or open_price <= stop_price) and (
+            is_sell_stop or open_price >= stop_price
+        ):
+            no_slippage_fill_price = open_price
         return no_slippage_fill_price
 
     def _check_order_validity(self, order):
-        assert order.time_in_force == TimeInForce.DAY or order.time_in_force == TimeInForce.GTC, \
-            "Only TimeInForce.DAY or TimeInForce.GTC Time in Force is accepted by StopOrdersExecutor"
+        assert order.time_in_force in [
+            TimeInForce.DAY,
+            TimeInForce.GTC,
+        ], "Only TimeInForce.DAY or TimeInForce.GTC Time in Force is accepted by StopOrdersExecutor"
         assert isinstance(order.execution_style, StopOrder), \
-            "Only StopOrder ExecutionStyle is supported by StopOrdersExecutor"
+                "Only StopOrder ExecutionStyle is supported by StopOrdersExecutor"
 
     @staticmethod
     def _order_expires(order: Order):

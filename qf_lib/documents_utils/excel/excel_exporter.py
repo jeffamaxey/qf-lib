@@ -167,12 +167,11 @@ class ExcelExporter:
         Gets a worksheet of given name from a provided workbook. If :sheet_name is None, then the active sheet
         from the workbook is returned.
         """
-        if sheet_name is None:
-            work_sheet = work_book.active
-        else:
-            work_sheet = self._get_or_create_worksheet(work_book, sheet_name)
-
-        return work_sheet
+        return (
+            work_book.active
+            if sheet_name is None
+            else self._get_or_create_worksheet(work_book, sheet_name)
+        )
 
     def write_to_worksheet(self, exported_value: Any, work_sheet: Worksheet, starting_row: int, starting_column: int,
                            include_index: bool, include_column_names: bool):
@@ -193,18 +192,19 @@ class ExcelExporter:
             work_sheet.cell(row=starting_row, column=starting_column, value=self._to_supported_type(exported_value))
 
     def _get_or_create_worksheet(self, work_book, sheet_name):
-        if sheet_name in work_book:
-            work_sheet = work_book[sheet_name]
-        else:
-            work_sheet = work_book.create_sheet(sheet_name)
-
-        return work_sheet
+        return (
+            work_book[sheet_name]
+            if sheet_name in work_book
+            else work_book.create_sheet(sheet_name)
+        )
 
     def _write_series_to_worksheet(self, series, work_sheet, starting_row: int, starting_column: int,
                                    include_index: bool, column_name: Optional[str]):
         column = starting_column
         if include_index:
-            self._export_index(series, starting_column, starting_row, work_sheet, column_name is not None)
+            self._export_index(
+                series, column, starting_row, work_sheet, column_name is not None
+            )
             column += 1
 
         row = starting_row

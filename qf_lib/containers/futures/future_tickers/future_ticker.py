@@ -256,12 +256,18 @@ class FutureTicker(Ticker, metaclass=abc.ABCMeta):
                              f"designated_contracts parameter of the {self.__class__.__name__}.")
 
         # Make sure that all the tickers have the correct point_value and security type
-        if any([ticker.point_value != self.point_value for ticker in expiration_dates.values]):
+        if any(
+            ticker.point_value != self.point_value
+            for ticker in expiration_dates.values
+        ):
             raise ValueError(f"Not all tickers in the chain have the point_value set to {self.point_value} as the "
                              f"Future Ticker. Please make sure that correct values are inserted by the DataProvider "
                              f"and _get_futures_chain_tickers() function.")
 
-        if any([ticker.security_type != self.security_type for ticker in expiration_dates.values]):
+        if any(
+            ticker.security_type != self.security_type
+            for ticker in expiration_dates.values
+        ):
             raise ValueError(f"Not all tickers in the chain have the point_value set to {self.point_value} as the "
                              f"Future Ticker. Please make sure that correct values are inserted by the DataProvider "
                              f"and _get_futures_chain_tickers() function.")
@@ -290,16 +296,18 @@ class FutureTicker(Ticker, metaclass=abc.ABCMeta):
         if other is self:
             return True
 
-        if not isinstance(other, FutureTicker):
-            return False
-
-        return self is other or (
+        return (
+            self is other
+            or (
                 type(self) == type(other)
                 and self._name == other.name
                 and self.family_id == other.family_id
                 and self.point_value == other.point_value
                 and self.N == other.get_N()
                 and self._days_before_exp_date == other.get_days_before_exp_date()
+            )
+            if isinstance(other, FutureTicker)
+            else False
         )
 
     def __hash__(self):

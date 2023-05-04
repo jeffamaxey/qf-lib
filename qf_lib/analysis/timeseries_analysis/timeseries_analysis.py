@@ -119,7 +119,7 @@ class TimeseriesAnalysis(TimeseriesAnalysisDTO):
 
         new_table.set_column_names(["Statistic", name])
         for item in self._get_results_list():
-            row_name = item[1] + " [" + item[3] + "]"
+            row_name = f"{item[1]} [{item[3]}]"
             if item[3] == '':
                 row_name = item[1]
 
@@ -165,25 +165,21 @@ class TimeseriesAnalysis(TimeseriesAnalysisDTO):
                 pass  # no header will be printed if series are without names
         result = ''
         if asset_names is not None:
-            names = ''
-            for name in asset_names:
-                names += '{:>20}'.format(str(name))
+            names = ''.join('{:>20}'.format(str(name)) for name in asset_names)
             result = '{:24} {}\n'.format("", names)
 
         first_ta = ta_list[0]
 
-        # create rows
-        list_of_rows = []
-        for nice_name in first_ta.get_nice_names():
-            list_of_rows.append("{:24} ".format(nice_name))
-
+        list_of_rows = [
+            "{:24} ".format(nice_name) for nice_name in first_ta.get_nice_names()
+        ]
         for ta in ta_list:
             values = ta.get_measures()
             for index, row in enumerate(list_of_rows):
                 list_of_rows[index] = row + "{:>20}".format(values[index])
 
         for index, unit in enumerate(first_ta.get_units()):
-            list_of_rows[index] += " {}\n".format(unit)
+            list_of_rows[index] += f" {unit}\n"
 
         for row in list_of_rows:
             result += row
@@ -213,19 +209,15 @@ class TimeseriesAnalysis(TimeseriesAnalysisDTO):
         name_ta_list = [(name, TimeseriesAnalysis(asset_tms, frequency)) for name, asset_tms in df.iteritems()]
         first_ta = name_ta_list[0][1]
 
-        result = "Analysed period: {} - {}, using {} data\n".format(
-            date_to_str(first_ta.start_date), date_to_str(first_ta.end_date), frequency)
+        result = f"Analysed period: {date_to_str(first_ta.start_date)} - {date_to_str(first_ta.end_date)}, using {frequency} data\n"
 
-        header_without_dates = ""
-        for value in first_ta.get_short_names()[2:]:
-            header_without_dates += '{:>12}'.format(value)
-
+        header_without_dates = "".join(
+            '{:>12}'.format(value) for value in first_ta.get_short_names()[2:]
+        )
         result += ("{:12} {}\n".format("Name", header_without_dates))
 
         for name, ta in name_ta_list:
-            values = ""
-            for value in ta.get_measures()[2:]:
-                values += '{:>12}'.format(value)
+            values = "".join('{:>12}'.format(value) for value in ta.get_measures()[2:])
             result += ("{:12} {}\n".format(name.as_string(), values))
         return result
 
@@ -233,37 +225,25 @@ class TimeseriesAnalysis(TimeseriesAnalysisDTO):
         """
         Returns a list of short names of all the measures
         """
-        result = []
-        for elements in self._get_results_list():
-            result.append(elements[0])
-        return result
+        return [elements[0] for elements in self._get_results_list()]
 
     def get_nice_names(self) -> List[str]:
         """
         Returns a list of long, nice names of all the measures
         """
-        result = []
-        for elements in self._get_results_list():
-            result.append(elements[1])
-        return result
+        return [elements[1] for elements in self._get_results_list()]
 
     def get_measures(self) -> List[str]:
         """
         Returns a list of all measures (values)  represented as strings
         """
-        result = []
-        for elements in self._get_results_list():
-            result.append(elements[2])
-        return result
+        return [elements[2] for elements in self._get_results_list()]
 
     def get_units(self) -> List[str]:
         """
         Returns a list of all units of all measures (values)
         """
-        result = []
-        for elements in self._get_results_list():
-            result.append(elements[3])
-        return result
+        return [elements[3] for elements in self._get_results_list()]
 
     def _get_results_list(self) -> List[Tuple[str]]:
         """
@@ -286,7 +266,7 @@ class TimeseriesAnalysis(TimeseriesAnalysisDTO):
             # represents a default
             return "{:0.2f}".format(value)
 
-        result_list = list()
+        result_list = []
 
         result_list.append(('start', 'Start Date', date_to_str(self.start_date), ''))
         result_list.append(('end', 'End Date', date_to_str(self.end_date), ''))

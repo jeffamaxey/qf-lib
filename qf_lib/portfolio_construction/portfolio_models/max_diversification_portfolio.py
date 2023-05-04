@@ -69,9 +69,7 @@ class MaxDiversificationPortfolio(Portfolio):
         result = qp(P, q, G, h, A, b, options=self.optimizer_options)
         dummy_weights = np.array(result['x']).squeeze()
         scaled_weights = dummy_weights / dummy_weights.sum()
-        weights_series = QFSeries(data=scaled_weights, index=self.cov_matrix.columns.values)
-
-        return weights_series
+        return QFSeries(data=scaled_weights, index=self.cov_matrix.columns.values)
 
     def calculate_diversification_ratio(self, weights: QFSeries) -> float:
         """

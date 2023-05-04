@@ -62,7 +62,7 @@ class BloombergFutureTicker(FutureTicker, BloombergTicker):
     """
     def __init__(self, name: str, family_id: str, N: int, days_before_exp_date: int, point_value: int = 1,
                  designated_contracts: str = "FGHJKMNQUVXZ", security_type: SecurityType = SecurityType.FUTURE):
-        if not len(designated_contracts) > 0:
+        if not designated_contracts:
             raise ValueError("At least one month code should be provided.")
 
         super().__init__(name, family_id, N, days_before_exp_date, point_value, designated_contracts, security_type)

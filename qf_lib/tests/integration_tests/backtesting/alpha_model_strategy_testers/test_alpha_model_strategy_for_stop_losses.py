@@ -128,11 +128,10 @@ class TestAlphaModelStrategy(TestCase):
             mocked_result.loc[str_to_date('2015-02-23'), tickers[0], PriceField.Low]
 
     def _test_trading_session_init(self):
-        ts = TradingSessionForTests(
+        return TradingSessionForTests(
             data_provider=self._price_provider_mock,
             start_date=self.test_start_date,
             end_date=self.test_end_date,
             initial_cash=1000000,
-            frequency=self.frequency
+            frequency=self.frequency,
         )
-        return ts

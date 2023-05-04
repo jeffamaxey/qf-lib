@@ -37,7 +37,7 @@ def map_future_ticker_to_contract():
     contract_ticker_mapper = IBContractTickerMapper(mapping, data_provider)
     current_time = str_to_date("2020-12-01")
 
-    for future_ticker in mapping.keys():
+    for future_ticker in mapping:
         if isinstance(future_ticker, BloombergFutureTicker):
             future_ticker.initialize_data_provider(SettableTimer(current_time), data_provider)
 

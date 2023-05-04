@@ -107,9 +107,13 @@ class QFDataArray(xr.DataArray):
         QFDataArray
         """
         xr_data_array = xr_data_array.transpose(DATES, TICKERS, FIELDS)
-        qf_data_array = QFDataArray.create(
-            xr_data_array.dates, xr_data_array.tickers, xr_data_array.fields, xr_data_array.data, xr_data_array.name)
-        return qf_data_array
+        return QFDataArray.create(
+            xr_data_array.dates,
+            xr_data_array.tickers,
+            xr_data_array.fields,
+            xr_data_array.data,
+            xr_data_array.name,
+        )
 
     @classmethod
     def concat(cls, objs, dim, data_vars='all', coords='different', compat='equals', positions=None,
@@ -144,8 +148,11 @@ class QFDataArray(xr.DataArray):
             data_asof = ticker_df.asof(date)
             asof_values[i, :] = data_asof
 
-        result = QFDataFrame(data=asof_values, index=self.tickers.to_index(), columns=self.fields.to_index())
-        return result
+        return QFDataFrame(
+            data=asof_values,
+            index=self.tickers.to_index(),
+            columns=self.fields.to_index(),
+        )
 
     def _check_if_dimensions_are_correct(self, coords, dims):
         expected_dimensions = (DATES, TICKERS, FIELDS)
@@ -156,4 +163,4 @@ class QFDataArray(xr.DataArray):
         else:
             actual_dimensions = None
         if actual_dimensions != expected_dimensions:
-            raise ValueError("Dimensions must be equal to: {}".format(expected_dimensions))
+            raise ValueError(f"Dimensions must be equal to: {expected_dimensions}")

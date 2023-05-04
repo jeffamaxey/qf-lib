@@ -113,8 +113,9 @@ class CSVDataProvider(PresetDataProvider):
         # Convert to list and remove duplicates
         tickers, _ = convert_to_list(tickers, Ticker)
         tickers = list(dict.fromkeys(tickers))
-        assert len([t for t in tickers if isinstance(t, FutureTicker)]) == 0, "FutureTickers are not supported by " \
-                                                                              "this data provider"
+        assert not [t for t in tickers if isinstance(t, FutureTicker)], (
+            "FutureTickers are not supported by " "this data provider"
+        )
 
         data_array, start_date, end_date, available_fields = self._get_data(path, tickers, fields, start_date, end_date,
                                                                             frequency, field_to_price_field_dict,
@@ -185,20 +186,16 @@ class CSVDataProvider(PresetDataProvider):
         if not tickers_prices_dict.values():
             raise ImportError("No data was found. Check the correctness of all data")
 
-        if fields:
-            available_fields = list(fields)
-        else:
-            available_fields = list(available_fields)
-
+        available_fields = list(fields) if fields else list(available_fields)
         if field_to_price_field_dict:
             available_fields.extend(list(field_to_price_field_dict.values()))
 
         if not start_date:
-            start_date = min(list(df.index.min() for df in tickers_prices_dict.values()))
+            start_date = min(df.index.min() for df in tickers_prices_dict.values())
 
         if not end_date:
-            end_date = max(list(df.index.max() for df in tickers_prices_dict.values()))
+            end_date = max(df.index.max() for df in tickers_prices_dict.values())
 
         result = tickers_dict_to_data_array(tickers_prices_dict, list(tickers_prices_dict.keys()), available_fields), \
-            start_date, end_date, available_fields
+                start_date, end_date, available_fields
         return result

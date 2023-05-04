@@ -135,13 +135,11 @@ class VolatilityForecast:
         am = self._get_ARCH_model(returns, self.vol_process)
         res = am.fit(disp='off', show_warning=False)  # options={'maxiter': 10000, 'ftol': 1e-2})
         forecasts = res.forecast(horizon=self.horizon, method=self.method)
-        column_str = 'h.{}'.format(self.horizon)  # take value for the selected horizon
+        column_str = f'h.{self.horizon}'
         forecasts_series = forecasts.variance[column_str]
         # take the last value (most recent forecast)
         forecasted_value = forecasts_series[-1]
-        # convert to volatility (if power=2, forecasted_value corresponds to variance, etc.)
-        forecasted_vol = forecasted_value ** (1 / float(am.volatility.power))
-        return forecasted_vol
+        return forecasted_value ** (1 / float(am.volatility.power))
 
     def _get_ARCH_model(self, returns: LogReturnsSeries, vol_process: VolatilityProcess):
         am = ConstantMean(returns)

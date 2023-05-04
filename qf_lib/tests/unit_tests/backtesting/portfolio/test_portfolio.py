@@ -263,8 +263,6 @@ class TestPortfolio(unittest.TestCase):
     def test_transact_transaction_split_and_close(self):
         portfolio, dh, _ = self.get_portfolio_and_data_handler()
 
-        # Transact the initial transaction
-        transactions = []
         quantity = 50
 
         # Set initial price for the given ticker
@@ -274,7 +272,7 @@ class TestPortfolio(unittest.TestCase):
         initial_transaction = Transaction(self.random_time, self.fut_ticker, quantity=quantity, price=price_1,
                                           commission=10)
         portfolio.transact_transaction(initial_transaction)
-        transactions.append(initial_transaction)
+        transactions = [initial_transaction]
         portfolio.update()
 
         # Change of price for the given ticker
@@ -430,15 +428,10 @@ class TestPortfolio(unittest.TestCase):
         assert_series_equal(expected_leverage_series, leverage_tms)
 
     def test_portfolio_leverage2(self):
-        expected_values = []
-        expected_dates = []
-
         # empty portfolio
         portfolio, dh, timer = self.get_portfolio_and_data_handler()
         portfolio.update(record=True)
-        expected_values.append(0)
-        expected_dates.append(self.start_time)
-
+        expected_dates = [self.start_time]
         # buy contract
         quantity = 500
         price = 120
@@ -451,9 +444,9 @@ class TestPortfolio(unittest.TestCase):
         portfolio.update(record=True)
 
         gross_value = quantity * price
-        pnl = quantity * (120 - 120)
+        pnl = quantity * 0
         nav = self.initial_cash + pnl - commission1
-        expected_values.append(gross_value / nav)
+        expected_values = [0, gross_value / nav]
         expected_dates.append(new_time)
 
         # contract goes up in value

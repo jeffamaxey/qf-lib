@@ -49,10 +49,9 @@ class ValuesAnnotations(HeatMapChartDecorator):
 
             text_color = self.get_text_color(mesh_face_color)
             plot_settings = dict(color=text_color, ha="center", va="center")
-            plot_settings.update(self._plot_settings)
+            plot_settings |= self._plot_settings
             ax.text(x, y, annotation, **plot_settings)
 
     def get_text_color(self, background_color):
         luminance = sb_utils.relative_luminance(background_color)
-        text_color = ".15" if luminance > .408 else "w"
-        return text_color
+        return ".15" if luminance > .408 else "w"

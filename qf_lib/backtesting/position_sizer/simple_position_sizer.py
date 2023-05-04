@@ -26,13 +26,10 @@ class SimplePositionSizer(PositionSizer):
     This SimplePositionSizer converts signals to orders which are the size of 100% of the current portfolio value
     """
 
-    def _generate_market_orders(self, signals: List[Signal], time_in_force: TimeInForce, frequency: Frequency = None) \
-            -> List[Optional[Order]]:
+    def _generate_market_orders(self, signals: List[Signal], time_in_force: TimeInForce, frequency: Frequency = None) -> List[Optional[Order]]:
         target_percentages = {
             self._get_specific_ticker(signal.ticker): signal.suggested_exposure.value for signal in signals
         }
-        market_order_list = self._order_factory.target_percent_orders(
+        return self._order_factory.target_percent_orders(
             target_percentages, MarketOrder(), time_in_force, frequency=frequency
         )
-
-        return market_order_list

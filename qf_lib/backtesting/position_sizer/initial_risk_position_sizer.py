@@ -65,19 +65,20 @@ class InitialRiskPositionSizer(PositionSizer):
     def initial_risk(self):
         return self._initial_risk
 
-    def _generate_market_orders(self, signals: List[Signal], time_in_force: TimeInForce, frequency: Frequency = None) \
-            -> List[Optional[Order]]:
+    def _generate_market_orders(self, signals: List[Signal], time_in_force: TimeInForce, frequency: Frequency = None) -> List[Optional[Order]]:
 
         target_percentages = {
             self._get_specific_ticker(signal.ticker): self._compute_target_percentage(signal)
             for signal in signals
         }
 
-        market_order_list = self._order_factory.target_percent_orders(
-            target_percentages, MarketOrder(), time_in_force, self.tolerance_percentage, frequency
+        return self._order_factory.target_percent_orders(
+            target_percentages,
+            MarketOrder(),
+            time_in_force,
+            self.tolerance_percentage,
+            frequency,
         )
-
-        return market_order_list
 
     def _cap_max_target_percentage(self, initial_target_percentage: float):
         """
@@ -85,24 +86,27 @@ class InitialRiskPositionSizer(PositionSizer):
         Cap the target percentage to the max value defined in this function
         """
         if (self.max_target_percentage is not None) and (initial_target_percentage > self.max_target_percentage):
-            self.logger.info("Target Percentage: {} above the maximum of {}. Setting the target percentage to {}"
-                             .format(initial_target_percentage, self.max_target_percentage, self.max_target_percentage))
+            self.logger.info(
+                f"Target Percentage: {initial_target_percentage} above the maximum of {self.max_target_percentage}. Setting the target percentage to {self.max_target_percentage}"
+            )
             return self.max_target_percentage
         return initial_target_percentage
 
     def _compute_target_percentage(self, signal):
         if not is_finite_number(signal.fraction_at_risk) or signal.fraction_at_risk == 0.0:
-            self.logger.warn("Invalid Fraction at Risk = {} for {}. Setting target percentage = 0.0".format(
-                signal.fraction_at_risk, signal.ticker))
+            self.logger.warn(
+                f"Invalid Fraction at Risk = {signal.fraction_at_risk} for {signal.ticker}. Setting target percentage = 0.0"
+            )
             return 0.0
         target_percentage = self._initial_risk / signal.fraction_at_risk
-        self.logger.info("Target Percentage for {}: {}".format(signal.ticker, target_percentage))
+        self.logger.info(f"Target Percentage for {signal.ticker}: {target_percentage}")
 
         target_percentage = self._cap_max_target_percentage(target_percentage)
 
         target_percentage *= signal.suggested_exposure.value  # preserve the direction (-1, 0 , 1)
-        self.logger.info("Target Percentage considering direction for {}: {}".format(signal.ticker,
-                                                                                     target_percentage))
+        self.logger.info(
+            f"Target Percentage considering direction for {signal.ticker}: {target_percentage}"
+        )
 
         assert is_finite_number(target_percentage), "target_percentage has to be a finite number"
         return target_percentage

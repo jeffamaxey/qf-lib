@@ -77,8 +77,7 @@ class QuandlDataProvider(DataProvider):
     def _get_history(
             self, convert_to_prices_types: bool, tickers: Union[QuandlTicker, Sequence[QuandlTicker]],
             fields: Union[None, str, Sequence[str], PriceField, Sequence[PriceField]] = None,
-            start_date: datetime = None, end_date: datetime = None) -> \
-            Union[QFSeries, QFDataFrame, QFDataArray]:
+            start_date: datetime = None, end_date: datetime = None) -> Union[QFSeries, QFDataFrame, QFDataArray]:
         """
         NOTE: Only use one Quandl Database at the time.
         Do not mix multiple databases in one query - this is the natural limitation coming from the fact that column
@@ -99,18 +98,22 @@ class QuandlDataProvider(DataProvider):
             partial_result_dict = self._get_result_for_single_database(
                 convert_to_prices_types, ticker_group, fields, start_date, end_date)
 
-            result_dict.update(partial_result_dict)
+            result_dict |= partial_result_dict
 
         if fields is None:
             fields = get_fields_from_tickers_data_dict(result_dict)
 
         result_data_array = tickers_dict_to_data_array(result_dict, tickers, fields)
 
-        normalized_result = normalize_data_array(
-            result_data_array, tickers, fields, got_single_date, got_single_ticker, got_single_field,
-            use_prices_types=convert_to_prices_types)
-
-        return normalized_result
+        return normalize_data_array(
+            result_data_array,
+            tickers,
+            fields,
+            got_single_date,
+            got_single_ticker,
+            got_single_field,
+            use_prices_types=convert_to_prices_types,
+        )
 
     def _get_result_for_single_database(self, convert_to_prices_types, ticker_group, fields, start_date, end_date):
         first_ticker = ticker_group[0]  # type: QuandlTicker
@@ -129,7 +132,7 @@ class QuandlDataProvider(DataProvider):
             partial_result_dict = self._get_history_from_timeseries(
                 ticker_group, fields_as_strings, start_date, end_date)
         else:
-            raise LookupError("Quandl Database type: {} is not supported.".format(db_type))
+            raise LookupError(f"Quandl Database type: {db_type} is not supported.")
 
         if convert_to_prices_types:
             str_to_field = self._str_to_price_field_map(db_name, db_type)
@@ -144,22 +147,18 @@ class QuandlDataProvider(DataProvider):
         for dates_fields_values in result_dict.values():
             fields.update(dates_fields_values.fields.values)
 
-        fields = list(fields)
-        return fields
+        return list(fields)
 
     def supported_ticker_types(self):
         return {QuandlTicker}
 
     def _map_fields_to_str(self, fields: Sequence[PriceField], database_name: str, database_type: QuandlDBType):
         field_to_str = self._price_field_to_str_map(database_name, database_type)
-        fields_as_strings = [field_to_str[field] for field in fields]
-        return fields_as_strings
+        return [field_to_str[field] for field in fields]
 
     def _str_to_price_field_map(self, database_name: str, database_type: QuandlDBType):
         field_to_str = self._price_field_to_str_map(database_name, database_type)
-        str_to_field = {field_str: field for field, field_str in field_to_str.items()}
-
-        return str_to_field
+        return {field_str: field for field, field_str in field_to_str.items()}
 
     def _price_field_to_str_map(self, database_name: str, database_type: QuandlDBType) -> Dict[PriceField, str]:
         if database_type == QuandlDBType.Table and database_name == 'WIKI/PRICES':
@@ -191,7 +190,7 @@ class QuandlDataProvider(DataProvider):
             price_field_dict = {
                 PriceField.Close: 'Previous Settlement',
             }
-        elif database_name in ['ICE', 'CME', 'EUREX']:
+        elif database_name in {'ICE', 'CME', 'EUREX'}:
             # mapping for individual futures contracts
             price_field_dict = {
                 PriceField.Open: 'Open',
@@ -202,7 +201,7 @@ class QuandlDataProvider(DataProvider):
             }
         else:
             raise LookupError(
-                "Quandl Database: {} is not supported. PriceField -> string mapping is required.".format(database_name)
+                f"Quandl Database: {database_name} is not supported. PriceField -> string mapping is required."
             )
         return price_field_dict
 
@@ -272,21 +271,15 @@ class QuandlDataProvider(DataProvider):
     def _select_only_required_fields(self, ticker, ticker_data, fields):
         requested_fields_set = set(fields)
         got_fields_set = set(ticker_data.columns)
-        missing_fields = requested_fields_set - got_fields_set
-
-        if missing_fields:
+        if missing_fields := requested_fields_set - got_fields_set:
             missing_columns = [ticker.field_to_column_name(field) for field in missing_fields]
-            self.logger.warning("Columns {} have not been found in the Quandl response".format(missing_columns))
+            self.logger.warning(
+                f"Columns {missing_columns} have not been found in the Quandl response"
+            )
 
         fields_to_select = requested_fields_set.intersection(got_fields_set)
 
-        # if there are no fields which should be selected, return None
-        if not fields_to_select:
-            result = None
-        else:
-            result = ticker_data.loc[:, fields_to_select]
-
-        return result
+        return ticker_data.loc[:, fields_to_select] if fields_to_select else None
 
     @staticmethod
     def _format_single_ticker_table(table: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:

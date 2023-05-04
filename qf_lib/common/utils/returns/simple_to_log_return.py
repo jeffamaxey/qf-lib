@@ -30,5 +30,4 @@ def simple_to_log_return(simple_return: float) -> float:
         logarithmic return
     """
 
-    log_return = np.log(1 + simple_return)
-    return log_return
+    return np.log(1 + simple_return)

@@ -107,7 +107,7 @@ class DataCleaner:
                 elif first_valid_index != self.dataframe[column_name].index[0]:
                     self.start_late_columns[column_name] = first_valid_index
                 else:
-                    assert False, "Unknown reason for dropping column " + column_name
+                    assert False, f"Unknown reason for dropping column {column_name}"
 
         empty_values_idx.drop(columns_to_delete, axis=1, inplace=True)
         result_dataframe.drop(columns_to_delete, axis=1, inplace=True)

@@ -77,9 +77,9 @@ class GeneralPriceProvider(DataProvider):
             data of lower dimensionality will be returned.
         """
         use_prices_types = True
-        normalized_result = self._get_data_for_multiple_tickers(tickers, fields, start_date, end_date, frequency, use_prices_types)
-
-        return normalized_result
+        return self._get_data_for_multiple_tickers(
+            tickers, fields, start_date, end_date, frequency, use_prices_types
+        )
 
     def get_history(
             self, tickers: Union[Ticker, Sequence[Ticker]], fields: Union[str, Sequence[str]], start_date: datetime,
@@ -112,10 +112,9 @@ class GeneralPriceProvider(DataProvider):
             dimensionality will be returned.
         """
         use_prices_types = False
-        normalized_result = self._get_data_for_multiple_tickers(tickers, fields, start_date, end_date, frequency,
-                                                                use_prices_types)
-
-        return normalized_result
+        return self._get_data_for_multiple_tickers(
+            tickers, fields, start_date, end_date, frequency, use_prices_types
+        )
 
     def get_futures_chain_tickers(self, tickers: Union[FutureTicker, Sequence[FutureTicker]],
                                   expiration_date_fields: Union[ExpirationDateField, Sequence[ExpirationDateField]]) \
@@ -206,6 +205,7 @@ class GeneralPriceProvider(DataProvider):
         data_provider = self._ticker_type_to_data_provider_dict.get(ticker_class, None)
         if data_provider is None:
             raise LookupError(
-                "Unknown ticker type: {}. No appropriate data provider found".format(str(ticker_class)))
+                f"Unknown ticker type: {str(ticker_class)}. No appropriate data provider found"
+            )
 
         return data_provider

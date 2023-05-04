@@ -41,5 +41,4 @@ def sorino_ratio(qf_series: QFSeries, frequency: Frequency, risk_free: float = 0
     negative_returns = qf_series[qf_series < 0]
     annualised_downside_vol = get_volatility(negative_returns, frequency, annualise=True)
 
-    ratio = (annualised_growth_rate - risk_free) / annualised_downside_vol
-    return ratio
+    return (annualised_growth_rate - risk_free) / annualised_downside_vol

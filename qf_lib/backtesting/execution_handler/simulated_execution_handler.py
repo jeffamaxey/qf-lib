@@ -146,7 +146,7 @@ class SimulatedExecutionHandler(ExecutionHandler):
                 partial_order_id_list = self._market_on_close_orders_executor.assign_order_ids(orders_list)
                 scheduled_event_data[self._market_on_close_orders_executor].extend(orders_list)
             else:
-                raise ValueError("Unsupported ExecutionStyle: {}".format(order_style_type))
+                raise ValueError(f"Unsupported ExecutionStyle: {order_style_type}")
 
             order_id_list += partial_order_id_list
 
@@ -177,11 +177,12 @@ class SimulatedExecutionHandler(ExecutionHandler):
         raise OrderCancellingException("Order of id: {:d} wasn't found in the list of awaiting Orders")
 
     def get_open_orders(self) -> List[Order]:
-        orders = self._market_orders_executor.get_open_orders() \
-            + self._stop_orders_executor.get_open_orders() \
-            + self._market_on_close_orders_executor.get_open_orders() \
+        return (
+            self._market_orders_executor.get_open_orders()
+            + self._stop_orders_executor.get_open_orders()
+            + self._market_on_close_orders_executor.get_open_orders()
             + self._market_on_open_orders_executor.get_open_orders()
-        return orders
+        )
 
     def cancel_all_open_orders(self):
         self._market_orders_executor.cancel_all_open_orders()

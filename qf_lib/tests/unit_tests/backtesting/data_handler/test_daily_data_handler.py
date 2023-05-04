@@ -666,7 +666,7 @@ class TestDailyDataHandler(TestCase):
 
             end_date = end_time + RelativeDelta(days=1, hour=0, minute=0, second=0, microsecond=0, microseconds=-1)
             prices = prices.loc[:end_date]
-            return prices.iloc[-1] if not prices.empty else PricesSeries(index=t, data=nan)
+            return PricesSeries(index=t, data=nan) if prices.empty else prices.iloc[-1]
 
         price_data_provider_mock = Mock(spec=DataProvider, frequency=Frequency.DAILY)
         price_data_provider_mock.get_price.side_effect = get_price

@@ -88,10 +88,9 @@ class IBBroker(Broker):
 
             if wait_result:
                 return self.wrapper.net_liquidation
-            else:
-                error_msg = 'Time out while getting portfolio value'
-                self.logger.error(error_msg)
-                raise BrokerException(error_msg)
+            error_msg = 'Time out while getting portfolio value'
+            self.logger.error(error_msg)
+            raise BrokerException(error_msg)
 
     def get_portfolio_tag(self, tag: str) -> float:
         with self.lock:
@@ -103,10 +102,9 @@ class IBBroker(Broker):
 
             if wait_result:
                 return self.wrapper.tmp_value
-            else:
-                error_msg = 'Time out while getting portfolio tag: {}'.format(tag)
-                self.logger.error(error_msg)
-                raise BrokerException(error_msg)
+            error_msg = f'Time out while getting portfolio tag: {tag}'
+            self.logger.error(error_msg)
+            raise BrokerException(error_msg)
 
     def get_positions(self) -> List[BrokerPosition]:
         with self.lock:
@@ -116,10 +114,9 @@ class IBBroker(Broker):
 
             if self._wait_for_results():
                 return self.wrapper.position_list
-            else:
-                error_msg = 'Time out while getting positions'
-                self.logger.error(error_msg)
-                raise BrokerException(error_msg)
+            error_msg = 'Time out while getting positions'
+            self.logger.error(error_msg)
+            raise BrokerException(error_msg)
 
     def get_liquid_hours(self, contract: IBContract) -> QFDataFrame:
         """ Returns a QFDataFrame containing information about liquid hours of the given contract. """
@@ -153,10 +150,9 @@ class IBBroker(Broker):
 
             if self._wait_for_results():
                 return self.wrapper.contract_details
-            else:
-                error_msg = 'Time out while getting contract details'
-                self.logger.error(error_msg)
-                raise BrokerException(error_msg)
+            error_msg = 'Time out while getting contract details'
+            self.logger.error(error_msg)
+            raise BrokerException(error_msg)
 
     def place_orders(self, orders: Sequence[Order]) -> Sequence[int]:
         with self.orders_placement_lock:
@@ -164,7 +160,7 @@ class IBBroker(Broker):
 
             order_ids_list = []
             for order in orders:
-                self.logger.info('Placing Order: {}'.format(order))
+                self.logger.info(f'Placing Order: {order}')
                 order_id = self._execute_single_order(order) or self._find_newly_added_order_id(order, open_order_ids)
                 if order_id is None:
                     error_msg = f"Not able to place order: {order}"
@@ -176,13 +172,13 @@ class IBBroker(Broker):
 
     def cancel_order(self, order_id: int):
         with self.lock:
-            self.logger.info('Cancel order: {}'.format(order_id))
+            self.logger.info(f'Cancel order: {order_id}')
             self._reset_action_lock()
             self.wrapper.set_cancel_order_id(order_id)
             self.client.cancelOrder(order_id)
 
             if not self._wait_for_results():
-                error_msg = 'Time out while cancelling order id {} : \n'.format(order_id)
+                error_msg = f'Time out while cancelling order id {order_id} : \n'
                 self.logger.error(error_msg)
                 raise OrderCancellingException(error_msg)
 
@@ -194,10 +190,9 @@ class IBBroker(Broker):
 
             if self._wait_for_results():
                 return self.wrapper.order_list
-            else:
-                error_msg = 'Timeout while getting open orders'
-                self.logger.error(error_msg)
-                raise BrokerException(error_msg)
+            error_msg = 'Timeout while getting open orders'
+            self.logger.error(error_msg)
+            raise BrokerException(error_msg)
 
     def cancel_all_open_orders(self):
         """
@@ -238,8 +233,7 @@ class IBBroker(Broker):
     def _wait_for_results(self, waiting_time: Optional[int] = None) -> bool:
         """ Wait for self.waiting_time """
         waiting_time = waiting_time or self.waiting_time
-        wait_result = self.action_event_lock.wait(waiting_time)
-        return wait_result
+        return self.action_event_lock.wait(waiting_time)
 
     def _reset_action_lock(self):
         """ threads calling wait() will block until set() is called"""

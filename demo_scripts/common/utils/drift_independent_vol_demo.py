@@ -39,11 +39,11 @@ def _calculate_single_values(data_provider):
     prices_df = data_provider.get_price(ticker, fields, start_date, end_date)
 
     di_vol = DriftIndependentVolatility.get_volatility(prices_df, Frequency.DAILY)
-    print("drift_independent_vol = {}".format(di_vol))
+    print(f"drift_independent_vol = {di_vol}")
 
     close_price_tms = prices_df[PriceField.Close]
     simple_vol = get_volatility(close_price_tms, Frequency.DAILY)
-    print("simple_vol = {}".format(simple_vol))
+    print(f"simple_vol = {simple_vol}")
 
 
 def _calculate_timeseries(data_provider):

@@ -483,8 +483,7 @@ class OrderSamples:
         # to activate all its predecessors
         stopLoss.transmit = True
 
-        bracketOrder = [parent, takeProfit, stopLoss]
-        return bracketOrder
+        return [parent, takeProfit, stopLoss]
 
     """ <summary>
     #/ Products:CFD, FUT, FOP, OPT, STK, WAR
@@ -627,9 +626,7 @@ class OrderSamples:
         order.totalQuantity = quantity
         order.lmtPrice = limitPrice
         if nonGuaranteed:
-            order.smartComboRoutingParams = []
-            order.smartComboRoutingParams.append(
-                TagValue("NonGuaranteed", "1"))
+            order.smartComboRoutingParams = [TagValue("NonGuaranteed", "1")]
         return order
 
     """ <summary>
@@ -647,9 +644,7 @@ class OrderSamples:
         order.orderType = "MKT"
         order.totalQuantity = quantity
         if nonGuaranteed:
-            order.smartComboRoutingParams = []
-            order.smartComboRoutingParams.append(
-                TagValue("NonGuaranteed", "1"))
+            order.smartComboRoutingParams = [TagValue("NonGuaranteed", "1")]
         return order
 
     """ <summary>
@@ -672,9 +667,7 @@ class OrderSamples:
             comboLeg.price = price
             order.orderComboLegs.append(comboLeg)
         if nonGuaranteed:
-            order.smartComboRoutingParams = []
-            order.smartComboRoutingParams.append(
-                TagValue("NonGuaranteed", "1"))
+            order.smartComboRoutingParams = [TagValue("NonGuaranteed", "1")]
         return order
 
     """ <summary>
@@ -693,9 +686,7 @@ class OrderSamples:
         order.orderType = "REL + LMT"
         order.lmtPrice = limitPrice
         if nonGuaranteed:
-            order.smartComboRoutingParams = []
-            order.smartComboRoutingParams.append(
-                TagValue("NonGuaranteed", "1"))
+            order.smartComboRoutingParams = [TagValue("NonGuaranteed", "1")]
         return order
 
     """ <summary>
@@ -713,9 +704,7 @@ class OrderSamples:
         order.totalQuantity = quantity
         order.orderType = "REL + MKT"
         if nonGuaranteed:
-            order.smartComboRoutingParams = []
-            order.smartComboRoutingParams.append(
-                TagValue("NonGuaranteed", "1"))
+            order.smartComboRoutingParams = [TagValue("NonGuaranteed", "1")]
         return order
 
     """ <summary>

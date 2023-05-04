@@ -93,7 +93,6 @@ class TestAlphaModelStrategy(unittest.TestCase):
         Test the result of _get_current_exposure function for a future ticker in case of an empty portfolio and in case
         if a position for the given specific ticker exists.
         """
-        expected_current_exposure_values = []
         # Set current specific ticker to ExampleZ00 Comdty and open position in the portfolio for the current ticker
         ticker = BloombergTicker("ExampleZ00 Comdty", SecurityType.FUTURE, 1)
         self.future_ticker.get_current_specific_ticker.return_value = ticker
@@ -101,7 +100,7 @@ class TestAlphaModelStrategy(unittest.TestCase):
                                                           use_stop_losses=False)
         # In case of empty portfolio get_signal function should have current exposure set to OUT
         futures_alpha_model_strategy.calculate_and_place_orders()
-        expected_current_exposure_values.append(Exposure.OUT)
+        expected_current_exposure_values = [Exposure.OUT]
         self.alpha_model.get_signal.assert_called_with(self.future_ticker, Exposure.OUT, self.ts.timer.now(),
                                                        Frequency.DAILY)
 

@@ -50,7 +50,7 @@ class TestPositionSizer(unittest.TestCase):
         cls.initial_risk = 0.02
         cls.max_target_percentage = 1.5
         cls.portfolio_value = 1000
-        cls.volume = QFSeries([1.5 for i in range(10)])
+        cls.volume = QFSeries([1.5 for _ in range(10)])
 
     def setUp(self) -> None:
         position = BrokerPosition(self.ticker, self.initial_position, 25)

@@ -141,7 +141,7 @@ class SignalsPlotter(AbstractDocument):
                 try:
                     self.timer.set_current_time(date)
                     new_exposure = alpha_model.get_signal(ticker, prev_exposure, date, self.data_frequency)\
-                        .suggested_exposure
+                            .suggested_exposure
                     exposures.append(new_exposure.value)
                     dates.append(date)
 
@@ -162,7 +162,7 @@ class SignalsPlotter(AbstractDocument):
 
         # create a chart with highlights of all alpha models combined
         candlestick_chart = CandlestickChart(prices_df, title="All models summary")
-        for model, exposures_series in alpha_model_signals.items():
+        for exposures_series in alpha_model_signals.values():
             candlestick_chart.add_highlight(exposures_series)
         position_decorator = AxesPositionDecorator(*self.full_image_axis_position)
         candlestick_chart.add_decorator(position_decorator)
@@ -173,19 +173,21 @@ class SignalsPlotter(AbstractDocument):
         Create a data frame with OHLC prices for the given ticker.
         Here we can use data provider as we do not worry about look-ahead
         """
-        if isinstance(ticker, FutureTicker):
-            futures_chain = FuturesChain(ticker, self.data_handler.data_provider, FuturesAdjustmentMethod.NTH_NEAREST)
-            prices_df = futures_chain.get_price(PriceField.ohlc(),
-                                                start_date=self.start_date,
-                                                end_date=self.end_date,
-                                                frequency=self.data_frequency)
-        else:
-            prices_df = self.data_handler.data_provider.get_price(ticker,
-                                                                  PriceField.ohlc(),
-                                                                  start_date=self.start_date,
-                                                                  end_date=self.end_date,
-                                                                  frequency=self.data_frequency)
-        return prices_df
+        if not isinstance(ticker, FutureTicker):
+            return self.data_handler.data_provider.get_price(
+                ticker,
+                PriceField.ohlc(),
+                start_date=self.start_date,
+                end_date=self.end_date,
+                frequency=self.data_frequency,
+            )
+        futures_chain = FuturesChain(ticker, self.data_handler.data_provider, FuturesAdjustmentMethod.NTH_NEAREST)
+        return futures_chain.get_price(
+            PriceField.ohlc(),
+            start_date=self.start_date,
+            end_date=self.end_date,
+            frequency=self.data_frequency,
+        )
 
     def add_models_implementation(self):
         """
@@ -197,25 +199,29 @@ class SignalsPlotter(AbstractDocument):
         """
         alpha_model_types = {alpha_model.__class__ for alpha_model in self.alpha_models}
         for model_type in alpha_model_types:
-            self.document.add_element(HeadingElement(2, "Implementation of {}".format(model_type.__name__)))
+            self.document.add_element(
+                HeadingElement(2, f"Implementation of {model_type.__name__}")
+            )
             self.document.add_element(ParagraphElement("\n"))
 
             with open(inspect.getfile(model_type)) as f:
                 class_implementation = f.read()
             # Remove the imports section
-            class_implementation = "<pre>class {}".format(model_type.__name__) + \
-                                   class_implementation.split("class {}".format(model_type.__name__))[1] + "</pre>"
+            class_implementation = (
+                f"<pre>class {model_type.__name__}"
+                + class_implementation.split(f"class {model_type.__name__}")[1]
+            ) + "</pre>"
             self.document.add_element(CustomElement(class_implementation))
 
     def save(self, report_dir: str = ""):
         # Set the style for the report
         plt.style.use(['tearsheet'])
 
-        file_name = "%Y_%m_%d-%H%M {}.pdf".format(self.title)
+        file_name = f"%Y_%m_%d-%H%M {self.title}.pdf"
         file_name = datetime.now().strftime(file_name)
 
         if not file_name.endswith(".pdf"):
-            file_name = "{}.pdf".format(file_name)
+            file_name = f"{file_name}.pdf"
 
         return self.pdf_exporter.generate([self.document], report_dir, file_name)
 

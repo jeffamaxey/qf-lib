@@ -27,15 +27,16 @@ def convert_dataframe_frequency(dataframe: QFDataFrame, frequency: Frequency) ->
     data_frequencies = dataframe.get_frequency()
     for column, col_frequency in data_frequencies.items():
         if col_frequency < frequency:
-            raise ValueError("Column '{}' cannot be converted to '{}' frequency because its frequency is '{}'.".format(
-                column, frequency, col_frequency))
+            raise ValueError(
+                f"Column '{column}' cannot be converted to '{frequency}' frequency because its frequency is '{col_frequency}'."
+            )
 
     if frequency == Frequency.DAILY:
         return dataframe.to_simple_returns()
 
     filled_df = dataframe.to_prices().fillna(method="ffill")
-    new_columns = {}
-    for column in filled_df:
-        new_columns[column] = get_aggregate_returns(filled_df[column], frequency)
-
+    new_columns = {
+        column: get_aggregate_returns(filled_df[column], frequency)
+        for column in filled_df
+    }
     return SimpleReturnsDataFrame(new_columns)

@@ -62,7 +62,7 @@ class ExposureGenerator:
         if frequency == Frequency.MONTHLY:
             self.positions_history = positions_history.resample('M').last()
         else:
-            raise NotImplementedError("{} sampling is not implemented".format(frequency))
+            raise NotImplementedError(f"{frequency} sampling is not implemented")
 
     def set_portfolio_nav_history(self, portfolio_eod_series: PricesSeries):
         """

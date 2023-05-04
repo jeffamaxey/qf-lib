@@ -40,16 +40,17 @@ class StopOrder(ExecutionStyle):
         self.stop_price = stop_price
 
     def __str__(self):
-        return "{} - stop price: {}".format(self.__class__.__name__, self.stop_price)
+        return f"{self.__class__.__name__} - stop price: {self.stop_price}"
 
     def __eq__(self, other):
         if other is self:
             return True
 
-        if not isinstance(other, StopOrder):
-            return False
-
-        return self.stop_price == other.stop_price
+        return (
+            self.stop_price == other.stop_price
+            if isinstance(other, StopOrder)
+            else False
+        )
 
     def __hash__(self):
         return hash((self.__class__.__name__, self.stop_price))

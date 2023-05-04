@@ -84,8 +84,7 @@ class DriftIndependentVolatility:
         c = DriftIndependentVolatility._get_normalized_close(ohlc).iloc[1:]
         n = ohlc.num_of_rows - 1
 
-        var_RS = sum(u * (u - c) + d * (d - c)) / n
-        return var_RS
+        return sum(u * (u - c) + d * (d - c)) / n
 
     @staticmethod
     def _open_variance(ohlc: QFDataFrame) -> float:
@@ -96,8 +95,7 @@ class DriftIndependentVolatility:
         o = DriftIndependentVolatility._get_normalized_open(ohlc).iloc[1:]
         n = ohlc.num_of_rows - 1
 
-        var_O = sum((o - o.mean()).pow(2)) / (n - 1)
-        return var_O
+        return sum((o - o.mean()).pow(2)) / (n - 1)
 
     @staticmethod
     def _close_variance(ohlc: QFDataFrame) -> float:
@@ -108,8 +106,7 @@ class DriftIndependentVolatility:
         c = DriftIndependentVolatility._get_normalized_close(ohlc).iloc[1:]
         n = ohlc.num_of_rows - 1
 
-        var_C = sum((c - c.mean()).pow(2)) / (n - 1)
-        return var_C
+        return sum((c - c.mean()).pow(2)) / (n - 1)
 
     @staticmethod
     def _get_normalized_open(ohlc: QFDataFrame) -> QFSeries:
@@ -119,8 +116,7 @@ class DriftIndependentVolatility:
         """
         o1 = ohlc[PriceField.Open]
         c0 = ohlc[PriceField.Close].shift(1)
-        normalized_open = np.log(o1) - np.log(c0)
-        return normalized_open
+        return np.log(o1) - np.log(c0)
 
     @staticmethod
     def _get_normalized_high(ohlc: QFDataFrame) -> QFSeries:
@@ -130,8 +126,7 @@ class DriftIndependentVolatility:
         """
         h1 = ohlc[PriceField.High]
         o1 = ohlc[PriceField.Open]
-        normalized_high = np.log(h1) - np.log(o1)
-        return normalized_high
+        return np.log(h1) - np.log(o1)
 
     @staticmethod
     def _get_normalized_low(ohlc: QFDataFrame) -> QFSeries:
@@ -141,8 +136,7 @@ class DriftIndependentVolatility:
         """
         l1 = ohlc[PriceField.Low]
         o1 = ohlc[PriceField.Open]
-        normalized_low = np.log(l1) - np.log(o1)
-        return normalized_low
+        return np.log(l1) - np.log(o1)
 
     @staticmethod
     def _get_normalized_close(ohlc: QFDataFrame) -> QFSeries:
@@ -152,8 +146,7 @@ class DriftIndependentVolatility:
         """
         c1 = ohlc[PriceField.Close]
         o1 = ohlc[PriceField.Open]
-        normalized_close = np.log(c1) - np.log(o1)
-        return normalized_close
+        return np.log(c1) - np.log(o1)
 
     @staticmethod
     def _k_factor(ohlc: QFDataFrame, alpha) -> float:
@@ -165,5 +158,4 @@ class DriftIndependentVolatility:
         if alpha is None:
             alpha = 1.34  # value suggested by the authors
 
-        k = (alpha - 1) / (alpha + (n + 1) / (n - 1))
-        return k
+        return (alpha - 1) / (alpha + (n + 1) / (n - 1))

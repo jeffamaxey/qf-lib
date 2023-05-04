@@ -86,8 +86,7 @@ class CandlestickChart(Chart):
     def get_full_data_range(self, container):
         full_range = date_range(self.data.index[0], self.data.index[-1],
                                 freq=self.data.get_frequency()[PriceField.Close].to_pandas_freq())
-        full_data = container.reindex(full_range)
-        return full_data
+        return container.reindex(full_range)
 
     def add_highlight(self, highlight_series: QFSeries):
         """

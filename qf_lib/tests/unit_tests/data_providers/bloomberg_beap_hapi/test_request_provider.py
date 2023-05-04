@@ -30,7 +30,9 @@ class TestBloombergBeapHapiRequestProvider(unittest.TestCase):
         self.request_id = 'sOmwhEReOveRTHeRainBOW'
         self.host = 'https://api.bloomberg.com'
         self.account_url = urljoin(self.host, self.address_url)
-        self.trigger_url = urljoin(self.host, '{}triggers/ctaAdhocTrigger/'.format(self.address_url))
+        self.trigger_url = urljoin(
+            self.host, f'{self.address_url}triggers/ctaAdhocTrigger/'
+        )
 
     def test_create_request__unknown_get_response(self):
         self.session_mock.get.return_value.status_code = 404

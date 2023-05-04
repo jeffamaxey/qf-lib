@@ -58,6 +58,4 @@ def rolling_volatility(qf_series: QFSeries, frequency: Frequency = None, annuali
 
     first_date_idx = window_size - 1
     dates = returns_tms.index[first_date_idx::]
-    volatility_tms = QFSeries(data=volatility_values, index=dates)
-
-    return volatility_tms
+    return QFSeries(data=volatility_values, index=dates)

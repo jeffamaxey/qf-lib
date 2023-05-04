@@ -77,6 +77,4 @@ def periods_list_from_bool_series(series: QFSeries) -> Sequence[Tuple[datetime, 
 def _infer_end_date(series: QFSeries) -> datetime:
     time_delta = series.get_frequency().time_delta()
     last_series_date = series.index[-1].to_pydatetime()
-    end_date = last_series_date + time_delta
-
-    return end_date
+    return last_series_date + time_delta

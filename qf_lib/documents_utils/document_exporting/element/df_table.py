@@ -268,11 +268,12 @@ class ModelController:
                                     self._columns_styles.items()
                                     if column_name in self.data.columns}
             # Add columns styles, which do not exist yet
-            existing_columns = [column_name for column_name in self._columns_styles.keys()]
-            self._columns_styles.update({
-                column_name: self.ColumnStyle(column_name) for column_name in self.data.columns.tolist()
+            existing_columns = list(self._columns_styles.keys())
+            self._columns_styles |= {
+                column_name: self.ColumnStyle(column_name)
+                for column_name in self.data.columns.tolist()
                 if column_name not in existing_columns
-            })
+            }
 
         return self._columns_styles
 
@@ -295,7 +296,7 @@ class ModelController:
 
     class Style:
         def __init__(self, style: Dict[str, str] = None, css_class: str = None):
-            self.style = style if style is not None else dict()
+            self.style = style if style is not None else {}
             self.css_class = css_class.split() if css_class is not None else []
             self.logger = qf_logger.getChild(self.__class__.__name__)
 
@@ -307,7 +308,9 @@ class ModelController:
                 try:
                     self.css_class.remove(class_name)
                 except ValueError:
-                    self.logger.warning("The css class {} can not be removed, as it does not exist".format(class_name))
+                    self.logger.warning(
+                        f"The css class {class_name} can not be removed, as it does not exist"
+                    )
 
         def add_styles(self, styles_dict: Dict[str, str]):
             styles_dict = {key.replace(" ", ""): value.replace(" ", "") for key, value in styles_dict.items()}
@@ -319,14 +322,15 @@ class ModelController:
                 try:
                     del self.style[property_name]
                 except KeyError:
-                    self.logger.warning("The css style for proptyety {} can not be removed, as it does not exist".
-                                        format(property_name))
+                    self.logger.warning(
+                        f"The css style for proptyety {property_name} can not be removed, as it does not exist"
+                    )
 
         def styles(self):
             # The function merges into string all styles. This string may be further used as the css styles attributes
             # value. No spaces between attributes and their values are allowed.
             def merge_styles(styles_dict: Dict[str, str]) -> str:
-                return "".join(['%s:%s;' % (key, value) for key, value in styles_dict.items()])
+                return "".join([f'{key}:{value};' for key, value in styles_dict.items()])
 
             styles = merge_styles(self.style)
             styles = '""' if len(styles) == 0 else styles

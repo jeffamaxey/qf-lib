@@ -64,6 +64,4 @@ def drop_consecutive_duplicates(series: QFSeries, method) -> QFSeries:
         raise ValueError("Incorrect method: {:s}".format(str(method)))
 
     is_not_duplicate_series = series.shift(shift) != series
-    no_duplicates_series = series.loc[is_not_duplicate_series]
-
-    return no_duplicates_series
+    return series.loc[is_not_duplicate_series]

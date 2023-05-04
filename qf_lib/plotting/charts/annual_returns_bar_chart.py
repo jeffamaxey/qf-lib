@@ -35,9 +35,9 @@ class AnnualReturnsBarChart(Chart):
 
     def _prepare_data_to_plot(self):
         simple_returns_tms = self.strategy_tms.to_simple_returns()
-        annual_returns_tms = get_aggregate_returns(series=simple_returns_tms, convert_to=Frequency.YEARLY)
-
-        return annual_returns_tms
+        return get_aggregate_returns(
+            series=simple_returns_tms, convert_to=Frequency.YEARLY
+        )
 
     def _plot_data(self, annual_returns_tms):
         self.axes.yaxis.set_major_formatter(PercentageFormatter())

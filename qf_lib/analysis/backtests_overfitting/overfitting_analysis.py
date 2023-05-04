@@ -68,23 +68,22 @@ class OverfittingAnalysis:
 
         logits = self.calculate_relative_rank_logits(self.best_is_strategies_names)
         logits_distribution = self._calculate_distribution(logits)
-        pbo = logits_distribution.where(logits_distribution.index <= 0).dropna().sum()
-        return pbo
+        return logits_distribution.where(logits_distribution.index <= 0).dropna().sum()
 
     def calculate_probability_of_loss(self):
         """ Returns the probability of loss for the best strategy. """
         self.create_is_oos_rankings()
         best_strategies_annualised_returns = self._get_best_strategies_returns()
         losing_strategies_returns = [returns for returns in best_strategies_annualised_returns if returns < 0]
-        pol = len(losing_strategies_returns) / len(best_strategies_annualised_returns)
-        return pol
+        return len(losing_strategies_returns) / len(best_strategies_annualised_returns)
 
     def calculate_expected_return(self):
         """ Returns the expected return of best strategies in the Out-Of-Sample."""
         self.create_is_oos_rankings()
         best_strategies_annualised_returns = self._get_best_strategies_returns()
-        expected_return = sum(best_strategies_annualised_returns) / len(best_strategies_annualised_returns)
-        return expected_return
+        return sum(best_strategies_annualised_returns) / len(
+            best_strategies_annualised_returns
+        )
 
     def get_best_strategies_is_oos_qualities(self):
         """
@@ -112,8 +111,7 @@ class OverfittingAnalysis:
         num_of_strategies = len(self.multiple_returns_timeseries.columns)
         relative_ranks = QFSeries(data=[oos_ranking["rank"].loc[best_is_strategy] / (num_of_strategies + 1)
                                         for oos_ranking, best_is_strategy in zip(self.oos_ranking, strategies_names)])
-        logits = np.log(relative_ranks.divide(1.0 - relative_ranks))
-        return logits
+        return np.log(relative_ranks.divide(1.0 - relative_ranks))
 
     def create_is_oos_rankings(self):
         if not self._rankings_computed:
@@ -205,5 +203,4 @@ class OverfittingAnalysis:
 
         """
         occurrences = qf_series.value_counts(sort=False).sort_index()
-        normalized_occurrences = occurrences / occurrences.sum()
-        return normalized_occurrences
+        return occurrences / occurrences.sum()

@@ -28,7 +28,7 @@ class TestBloombergBeapHapiUniverseProvider(unittest.TestCase):
         self.session_mock.post.return_value = self.post_response
         self.address_url = '/eap/catalogs/address_url_id/'
         self.fieldlist_id = 'sOmwhEReOveRTHeRainBOW'
-        self.location = '{}universes/{}/'.format(self.address_url, self.fieldlist_id)
+        self.location = f'{self.address_url}universes/{self.fieldlist_id}/'
         self.host = 'https://api.bloomberg.com'
         self.account_url = urljoin(self.host, self.address_url)
         self.tickers = ['TICKER']

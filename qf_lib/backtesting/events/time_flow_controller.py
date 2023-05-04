@@ -85,18 +85,19 @@ class LiveSessionTimeFlowController(TimeFlowController):
         time_events_list, next_time_of_event = self.scheduler.get_next_time_events()
 
         for time_event in time_events_list:
-            self.logger.info("Next time event: {}".format(time_event))
+            self.logger.info(f"Next time event: {time_event}")
 
         self.sleep_until(next_time_of_event)
 
         for time_event in time_events_list:
-            self.logger.info("Wake up! Current event: {}, Next event: {}".format(
-                time_event.__class__.__name__, next_time_of_event))
+            self.logger.info(
+                f"Wake up! Current event: {time_event.__class__.__name__}, Next event: {next_time_of_event}"
+            )
             self.event_manager.publish(time_event)
 
     def sleep_until(self, time_of_next_time_event: datetime):
         # if we're in the live session we need to put the program to sleep until the next TimeEvent
         now = self.real_timer.now()
         waiting_time = time_of_next_time_event - now
-        self.logger.info("Going to sleep for {} ".format(waiting_time))
+        self.logger.info(f"Going to sleep for {waiting_time} ")
         time.sleep(waiting_time.total_seconds())

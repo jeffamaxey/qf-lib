@@ -64,8 +64,7 @@ class TestQFDataArrayAsOf(TestCase):
         sample_data = [float(i) for i in range(num_of_dates * num_of_tickers * num_of_fields)]
         sample_3d_data = np.reshape(sample_data, (num_of_dates, num_of_tickers, num_of_fields))
 
-        sample_data_array = QFDataArray.create(dates, tickers, fields, sample_3d_data)
-        return sample_data_array
+        return QFDataArray.create(dates, tickers, fields, sample_3d_data)
 
     def test_asof_nans_when_no_data_available(self):
         actual_result = self.qf_data_array.asof(str_to_date('2018-02-02'))

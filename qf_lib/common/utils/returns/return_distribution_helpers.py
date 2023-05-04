@@ -64,8 +64,8 @@ def generate_random_paths(sample_len: int, sample_size: int, mean: float, std: f
     SimpleReturnsDataFrame
         indexed by steps with paths as columns
     """
-    mean = mean * leverage
-    std = std * leverage
+    mean *= leverage
+    std *= leverage
 
     time = np.arange(1, 1 + sample_len)
 
@@ -78,11 +78,11 @@ def generate_random_log_paths(sample_len: int, sample_size: int, mean: float, st
     """
     Equivalent of generate_random_paths, but uses log Returns instead
     """
-    mean = mean * leverage
-    std = std * leverage
+    mean *= leverage
+    std *= leverage
 
     # Setting the mean of log returns at m - 0.5σ^2 ensures that returns have mean m regardless of σ^2
-    mean = mean - 0.5 * std * std
+    mean -= 0.5 * std * std
 
     time = np.arange(1, 1 + sample_len)
 

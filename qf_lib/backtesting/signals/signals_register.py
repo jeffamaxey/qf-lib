@@ -68,4 +68,4 @@ class SignalsRegister(metaclass=abc.ABCMeta):
     def _generate_ticker_name(self, signal: Signal) -> str:
         ticker = signal.ticker
         model_name = "" if signal.alpha_model is None else str(signal.alpha_model)
-        return ticker.name + "@" + model_name
+        return f"{ticker.name}@{model_name}"

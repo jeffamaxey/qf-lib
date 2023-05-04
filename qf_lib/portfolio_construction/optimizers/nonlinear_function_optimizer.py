@@ -52,7 +52,7 @@ class NonlinearFunctionOptimizer:
         if optimization_result.success:
             logger.info(optimization_result.message)
         else:
-            logger.warning("Unsuccessful optimization: " + optimization_result.message)
+            logger.warning(f"Unsuccessful optimization: {optimization_result.message}")
 
         return optimization_result.x
 

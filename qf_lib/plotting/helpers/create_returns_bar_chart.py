@@ -82,7 +82,7 @@ def create_returns_bar_chart(returns: QFSeries, frequency: Frequency = Frequency
 
     # Add a title.
     if title is None:
-        title = str(frequency).capitalize() + " Returns"
+        title = f"{str(frequency).capitalize()} Returns"
     title = TitleDecorator(title, key="title_decorator")
     chart.add_decorator(title)
     chart.add_decorator(AxesLabelDecorator("Returns", "Year"))

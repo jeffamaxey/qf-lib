@@ -219,13 +219,10 @@ class BlackLitterman:
         lambda = sharpe_ratio_of_market / vol_of_market.
         """
         vol = self._calculate_volatility()
-        lambda_ = self.sharpe / vol
-        return lambda_
+        return self.sharpe / vol
 
     def _calculate_volatility(self):
-        # calculate historical volatility of the portfolio with market weights
-        vol = sqrt(self.weights.dot(self.hist_cov.dot(self.weights.T)))
-        return vol
+        return sqrt(self.weights.dot(self.hist_cov.dot(self.weights.T)))
 
     def _caltulate_tau(self, len_of_returns: int):
         """

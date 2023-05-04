@@ -32,13 +32,7 @@ class TimeEvent(Event, metaclass=ABCMeta):
         pass
 
     def __eq__(self, other):
-        if self is other:
-            return True
-
-        if type(self) != type(other):
-            return False
-
-        return True
+        return True if self is other else type(self) == type(other)
 
     def __hash__(self):
         return hash(type(self))

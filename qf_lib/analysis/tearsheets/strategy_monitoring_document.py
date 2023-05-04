@@ -101,6 +101,6 @@ class StrategyMonitoringDocument(AbstractTearsheet):
         # Set the style for the report
         plt.style.use(['tearsheet'])
 
-        filename = "%Y_%m_%d-%H%M {}.pdf".format(self.title)
+        filename = f"%Y_%m_%d-%H%M {self.title}.pdf"
         filename = datetime.now().strftime(filename)
         return self.pdf_exporter.generate([self.document], report_dir, filename)

@@ -17,5 +17,4 @@ def information_ratio(portfolio: QFSeries, benchmark: QFSeries) -> float:
     excess_ret = portfolio_monthly - benchmark_monthly
     tracking_error = excess_ret.std()
 
-    information_ratio_value = (portfolio_avg - benchmark_avg) / tracking_error
-    return information_ratio_value
+    return (portfolio_avg - benchmark_avg) / tracking_error

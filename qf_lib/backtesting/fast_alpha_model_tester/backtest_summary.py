@@ -70,7 +70,7 @@ class BacktestSummary:
     @property
     def backtest_name(self) -> str:
         if self.asset_class is not None:
-            return "{} - {}".format(self.asset_class, self.alpha_model_type.__name__)
+            return f"{self.asset_class} - {self.alpha_model_type.__name__}"
         return self.alpha_model_type.__name__
 
     @property

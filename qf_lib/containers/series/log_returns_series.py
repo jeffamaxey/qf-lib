@@ -39,9 +39,9 @@ class LogReturnsSeries(ReturnsSeries):
         from qf_lib.containers.series.simple_returns_series import SimpleReturnsSeries
 
         simple_rets_values = [exp(log_ret) - 1 for log_ret in self.values]
-        simple_returns_tms = SimpleReturnsSeries(index=self.index.copy(), data=simple_rets_values).__finalize__(self)
-
-        return simple_returns_tms
+        return SimpleReturnsSeries(
+            index=self.index.copy(), data=simple_rets_values
+        ).__finalize__(self)
 
     def total_cumulative_return(self) -> float:
         return np.exp(self.sum()) - 1.0

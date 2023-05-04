@@ -30,10 +30,10 @@ class IndexTranslator:
     """
 
     def __init__(self, labels_to_locations_dict: Mapping[str, Number] = None):
-        self._labels_to_locations_dict = dict()
+        self._labels_to_locations_dict = {}
 
         if labels_to_locations_dict is not None:
-            self._labels_to_locations_dict.update(labels_to_locations_dict)
+            self._labels_to_locations_dict |= labels_to_locations_dict
 
     @classmethod
     def setup_ticks_and_labels(cls, chart: "Chart"):

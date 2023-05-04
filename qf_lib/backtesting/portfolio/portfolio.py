@@ -127,8 +127,7 @@ class Portfolio:
         Returns a timeseries of value of the portfolio expressed in currency units
         """
         end_of_day_date = list(map(lambda x: datetime(x.year, x.month, x.day), self._dates))  # remove time component
-        portfolio_timeseries = PricesSeries(data=self._portfolio_values, index=end_of_day_date)
-        return portfolio_timeseries
+        return PricesSeries(data=self._portfolio_values, index=end_of_day_date)
 
     def leverage_series(self) -> QFSeries:
         """

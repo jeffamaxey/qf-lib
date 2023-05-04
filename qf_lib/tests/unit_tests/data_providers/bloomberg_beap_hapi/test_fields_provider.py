@@ -28,7 +28,7 @@ class TestBloombergBeapHapiFieldsProvider(unittest.TestCase):
         self.session_mock.post.return_value = self.post_response
         self.address_url = '/eap/catalogs/address_url_id/'
         self.fieldlist_id = 'sOmwhEReOveRTHeRainBOW'
-        self.location = '{}fieldLists/{}/'.format(self.address_url, self.fieldlist_id)
+        self.location = f'{self.address_url}fieldLists/{self.fieldlist_id}/'
         self.post_response.headers = {'Location': self.location}
         self.host = 'https://api.bloomberg.com'
         self.account_url = urljoin(self.host, self.address_url)

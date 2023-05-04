@@ -34,6 +34,6 @@ class FixedSlippage(Slippage):
     def _get_fill_prices(self, date: datetime, orders: Sequence[Order], no_slippage_fill_prices: Sequence[float],
                          fill_volumes: Sequence[int]) -> Sequence[float]:
         fill_volumes = np.array([order.quantity for order in orders])
-        fill_prices = np.array(no_slippage_fill_prices) + np.copysign(self.slippage_per_share, fill_volumes)
-
-        return fill_prices
+        return np.array(no_slippage_fill_prices) + np.copysign(
+            self.slippage_per_share, fill_volumes
+        )

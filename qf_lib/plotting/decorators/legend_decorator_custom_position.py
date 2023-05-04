@@ -53,14 +53,11 @@ class LegendDecoratorCustomPosition(ChartDecorator):
             a label which should be assigned to a given decorator
         """
         if not isinstance(label, str):
-            label = str(label)
+            label = label
         self.item_labels.append((item, label))
 
     def decorate(self, chart: "Chart") -> None:
-        axes = chart.axes
-        if chart.secondary_axes is not None:
-            axes = chart.secondary_axes
-
+        axes = chart.secondary_axes if chart.secondary_axes is not None else chart.axes
         # If there are no items to be included in the legend, don't show the legend at all
         if not self.item_labels:
             return
@@ -89,7 +86,5 @@ class LegendDecoratorCustomPosition(ChartDecorator):
                 }
             };""")
 
-        legend_labels = {}
-        for item, label in self.item_labels:
-            legend_labels[item.key] = label
+        legend_labels = {item.key: label for item, label in self.item_labels}
         return template.render(chart_id=chart_id, legend_labels=json.dumps(legend_labels))

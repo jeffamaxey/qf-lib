@@ -41,11 +41,9 @@ def annualise_with_sqrt(
 
     occurrences_in_year = frequency.occurrences_in_year
 
-    if isinstance(values, float) or isinstance(values, int):
-        annualised_values = values * sqrt(occurrences_in_year)
+    if isinstance(values, (float, int)):
+        return values * sqrt(occurrences_in_year)
     elif isinstance(values, Series):
-        annualised_values = values.multiply(sqrt(occurrences_in_year))
+        return values.multiply(sqrt(occurrences_in_year))
     else:
-        annualised_values = [value * sqrt(occurrences_in_year) for value in values]
-
-    return annualised_values
+        return [value * sqrt(occurrences_in_year) for value in values]

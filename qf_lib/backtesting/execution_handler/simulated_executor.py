@@ -70,8 +70,7 @@ class SimulatedExecutor(metaclass=abc.ABCMeta):
         Cancel Order of given id (if it exists). Returns the cancelled Order or None if couldn't find the Order
         of given id.
         """
-        cancelled_order = self._awaiting_orders.pop(order_id, None)
-        return cancelled_order
+        return self._awaiting_orders.pop(order_id, None)
 
     def get_open_orders(self) -> List[Order]:
         """

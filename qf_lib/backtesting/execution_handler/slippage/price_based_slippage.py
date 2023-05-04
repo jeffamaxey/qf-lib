@@ -46,13 +46,10 @@ class PriceBasedSlippage(Slippage):
 
     def _get_single_fill_price(self, order, no_slippage_price):
         if math.isnan(no_slippage_price):
-            fill_price = float('nan')
-        else:
-            if order.quantity > 0:  # BUY Order
-                multiplier = 1 + self.slippage_rate
-            else:  # SELL Order
-                multiplier = 1 - self.slippage_rate
-
-            fill_price = no_slippage_price * multiplier
-
-        return fill_price
+            return float('nan')
+        multiplier = (
+            1 + self.slippage_rate
+            if order.quantity > 0
+            else 1 - self.slippage_rate
+        )
+        return no_slippage_price * multiplier

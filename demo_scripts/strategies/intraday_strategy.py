@@ -54,7 +54,7 @@ class IntradayMAStrategy(AbstractStrategy):
         self.logger = qf_logger.getChild(self.__class__.__name__)
 
     def calculate_and_place_orders(self):
-        self.logger.info("{} - Computing signals".format(self.timer.now()))
+        self.logger.info(f"{self.timer.now()} - Computing signals")
 
         # Compute the moving averages
         long_ma_len = 20
@@ -69,7 +69,7 @@ class IntradayMAStrategy(AbstractStrategy):
         short_ma_price = short_ma_series.mean()
 
         specific_ticker = self.ticker.get_current_specific_ticker() if isinstance(self.ticker, FutureTicker) \
-            else self.ticker
+                else self.ticker
         if short_ma_price >= long_ma_price:
             # Place a buy Market Order, adjusting the position to a value equal to 100% of the portfolio
             orders = self.order_factory.target_percent_orders({specific_ticker: 1.0}, MarketOrder(), TimeInForce.DAY)

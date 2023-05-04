@@ -40,11 +40,7 @@ class BarValuesDecorator(ChartDecorator):
         max_val = self.series.abs().max()
         space = max_val * 0.02
         for i, v in self.series.iteritems():
-            if v < 0:
-                x = space
-            else:
-                x = v + space
-
+            x = space if v < 0 else v + space
             chart.axes.text(x, i, '{:0.1%}'.format(v), verticalalignment='center', size=font_size)
 
         # move the right limit of the x axis because some labels might go beyond the chart

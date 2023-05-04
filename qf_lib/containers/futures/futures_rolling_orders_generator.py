@@ -106,5 +106,6 @@ class FuturesRollingOrdersGenerator:
             exp_dates = future_ticker.get_expiration_dates()
             date = exp_dates[exp_dates == expired_specific_ticker].index[0]
             if date <= self._timer.now():
-                self.logger.error("{} - Contract {} still found in the portfolio after expiration date {}"
-                                  .format(self._timer.now(), expired_specific_ticker, date))
+                self.logger.error(
+                    f"{self._timer.now()} - Contract {expired_specific_ticker} still found in the portfolio after expiration date {date}"
+                )

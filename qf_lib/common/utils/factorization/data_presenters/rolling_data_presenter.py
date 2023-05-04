@@ -43,35 +43,41 @@ class RollingDataPresenter:
 
     def regression_coefficients_chart(self) -> LineChart:
         rolling_coeffs = self.rolling_model.coefficients_df
-        line_chart = self._create_line_chart(rolling_values=rolling_coeffs, title='Rolling regression coefficients')
-        return line_chart
+        return self._create_line_chart(
+            rolling_values=rolling_coeffs, title='Rolling regression coefficients'
+        )
 
     def t_statistics_chart(self) -> LineChart:
         rolling_t_stats = self.rolling_model.t_stats_df
-        line_chart = self._create_line_chart(rolling_values=rolling_t_stats, title='Rolling t-statistics')
-        return line_chart
+        return self._create_line_chart(
+            rolling_values=rolling_t_stats, title='Rolling t-statistics'
+        )
 
     def p_values_chart(self) -> LineChart:
         rolling_p_values = self.rolling_model.p_values_df
-        line_chart = self._create_line_chart(rolling_values=rolling_p_values, title='Rolling p-Value')
-        return line_chart
+        return self._create_line_chart(
+            rolling_values=rolling_p_values, title='Rolling p-Value'
+        )
 
     def r_squared_chart(self) -> LineChart:
         rolling_r_squared = self.rolling_model.r_squared_tms
         rolling_r_squared = rolling_r_squared.to_frame(name='R Squared Adjusted')
-        line_chart = self._create_line_chart(rolling_values=rolling_r_squared, title='R Squared')
-        return line_chart
+        return self._create_line_chart(
+            rolling_values=rolling_r_squared, title='R Squared'
+        )
 
     def correlations_chart(self) -> LineChart:
         # select correlations of different series with analysed timeseries
         rolling_correlations = self.rolling_model.correlations_df
-        line_chart = self._create_line_chart(rolling_values=rolling_correlations, title='Correlation')
-        return line_chart
+        return self._create_line_chart(
+            rolling_values=rolling_correlations, title='Correlation'
+        )
 
     def risk_contribution_chart(self) -> LineChart:
         rolling_risk_contribs = self.rolling_model.risk_contribs_df
-        line_chart = self._create_line_chart(rolling_values=rolling_risk_contribs, title='Risk Contribution')
-        return line_chart
+        return self._create_line_chart(
+            rolling_values=rolling_risk_contribs, title='Risk Contribution'
+        )
 
     def performance_attribution_chart(self) -> LineChart:
         rolling_factors_performance_attributions = self.rolling_model.factors_performance_attributions_df
@@ -79,8 +85,9 @@ class RollingDataPresenter:
         rolling_unexplained_perf_attribs.name = 'Unexplained/Alpha'
         rolling_perf_attribs = pd.concat([rolling_factors_performance_attributions, rolling_unexplained_perf_attribs],
                                          axis=1)
-        line_chart = self._create_line_chart(rolling_values=rolling_perf_attribs, title='Performance Attribution')
-        return line_chart
+        return self._create_line_chart(
+            rolling_values=rolling_perf_attribs, title='Performance Attribution'
+        )
 
     def _create_line_chart(self, rolling_values, title):
         line_chart = LineChart()

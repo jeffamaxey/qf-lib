@@ -335,9 +335,7 @@ class ContractSamples:
         leg2.action = "SELL"
         leg2.exchange = "DTB"
 
-        contract.comboLegs = []
-        contract.comboLegs.append(leg1)
-        contract.comboLegs.append(leg2)
+        contract.comboLegs = [leg1, leg2]
         return contract
 
     """ STK Combo contract
@@ -364,9 +362,7 @@ class ContractSamples:
         leg2.action = "SELL"
         leg2.exchange = "SMART"
 
-        contract.comboLegs = []
-        contract.comboLegs.append(leg1)
-        contract.comboLegs.append(leg2)
+        contract.comboLegs = [leg1, leg2]
         return contract
 
     """ CBOE Volatility Index Future combo contract """
@@ -391,9 +387,7 @@ class ContractSamples:
         leg2.action = "SELL"
         leg2.exchange = "CFE"
 
-        contract.comboLegs = []
-        contract.comboLegs.append(leg1)
-        contract.comboLegs.append(leg2)
+        contract.comboLegs = [leg1, leg2]
         return contract
 
     @staticmethod
@@ -416,9 +410,7 @@ class ContractSamples:
         leg2.action = "SELL"
         leg2.exchange = "IPE"
 
-        contract.comboLegs = []
-        contract.comboLegs.append(leg1)
-        contract.comboLegs.append(leg2)
+        contract.comboLegs = [leg1, leg2]
         return contract
 
     @staticmethod
@@ -441,9 +433,7 @@ class ContractSamples:
         leg2.action = "SELL"
         leg2.exchange = "NYMEX"
 
-        contract.comboLegs = []
-        contract.comboLegs.append(leg1)
-        contract.comboLegs.append(leg2)
+        contract.comboLegs = [leg1, leg2]
         return contract
 
     @staticmethod

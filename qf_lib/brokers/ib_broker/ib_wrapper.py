@@ -54,23 +54,23 @@ class IBWrapper(EWrapper):
         if 'self' in params_dict:
             del params_dict['self']
 
-        log_message = " -> Function Call: {}\n\tParameters:\n".format(fn_name)
+        log_message = f" -> Function Call: {fn_name}\n\tParameters:\n"
         for k, v in params_dict.items():
-            log_message += "\t\t{}: {}\n".format(k, v)
+            log_message += f"\t\t{k}: {v}\n"
 
         self.logger.info(log_message)
 
     @iswrapper
     def error(self, req_id: TickerId, error_code: int, error_string: str):
         if req_id == -1 and error_code != 502:
-            self.logger.info("Data Connection info: {} {} {}".format(req_id, error_code, error_string))
+            self.logger.info(f"Data Connection info: {req_id} {error_code} {error_string}")
         else:
             self.logAnswer(current_fn_name(), vars())
 
     @iswrapper
     def nextValidId(self, orderId: int):
         self.nextValidOrderId = orderId
-        self.logger.info("===> Next valid order ID: {}".format(orderId))
+        self.logger.info(f"===> Next valid order ID: {orderId}")
         self.action_event_lock.set()
 
     @iswrapper
@@ -82,7 +82,7 @@ class IBWrapper(EWrapper):
     def accountSummary(self, reqId: int, account: str, tag: str, value: str, currency: str):
         if tag == 'NetLiquidation':
             self.net_liquidation = float(value)
-            self.logger.info("===> NetLiquidation: {}".format(float(value)))
+            self.logger.info(f"===> NetLiquidation: {float(value)}")
         else:
             self.tmp_value = float(value)
 
@@ -117,12 +117,16 @@ class IBWrapper(EWrapper):
                     permId: int, parentId: int, lastFillPrice: float, clientId: int, whyHeld: str, mktCapPrice: float):
         self.logAnswer(current_fn_name(), vars())
 
-        if self._order_id_awaiting_submit == orderId and status in ['PreSubmitted', 'Submitted', 'PendingSubmit']:
-            self.logger.info('===> Order ID: {}, status: {}'.format(orderId, status))
+        if self._order_id_awaiting_submit == orderId and status in {
+            'PreSubmitted',
+            'Submitted',
+            'PendingSubmit',
+        }:
+            self.logger.info(f'===> Order ID: {orderId}, status: {status}')
             self.action_event_lock.set()
 
         if self._order_id_awaiting_cancel == orderId and status == 'Cancelled':
-            self.logger.info('===> Order ID: {}, status: {}'.format(orderId, status))
+            self.logger.info(f'===> Order ID: {orderId}, status: {status}')
             self.action_event_lock.set()
 
     @iswrapper
@@ -134,7 +138,7 @@ class IBWrapper(EWrapper):
         elif ib_order.orderType.upper() == 'MKT':
             execution_style = MarketOrder()
         else:
-            error_message = "Order Type is not supported: {}".format(ib_order.orderType)
+            error_message = f"Order Type is not supported: {ib_order.orderType}"
             self.logger.error(error_message)
             raise ValueError(error_message)
 
@@ -143,7 +147,7 @@ class IBWrapper(EWrapper):
         elif ib_order.action.upper() == 'BUY':
             quantity = ib_order.totalQuantity
         else:
-            error_message = "Order Action is not supported: {}".format(ib_order.action)
+            error_message = f"Order Action is not supported: {ib_order.action}"
             self.logger.error(error_message)
             raise ValueError(error_message)
 
@@ -154,7 +158,7 @@ class IBWrapper(EWrapper):
         elif ib_order.tif.upper() == 'OPG':
             time_in_force = TimeInForce.OPG
         else:
-            error_message = "Time in Force is not supported: {}".format(ib_order.tif)
+            error_message = f"Time in Force is not supported: {ib_order.tif}"
             self.logger.error(error_message)
             raise ValueError(error_message)
 

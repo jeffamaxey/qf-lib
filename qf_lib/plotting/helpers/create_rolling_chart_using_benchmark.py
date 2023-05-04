@@ -82,8 +82,11 @@ def create_rolling_chart_using_benchmark(
         legend.add_entry(rolling_element, tms.name)
 
     # Add title
-    chart.add_decorator(TitleDecorator("Rolling {} (window: {}, step: {}, BM: {}) ".
-                                       format(func_name, window_size, step, benchmark_series.name)))
+    chart.add_decorator(
+        TitleDecorator(
+            f"Rolling {func_name} (window: {window_size}, step: {step}, BM: {benchmark_series.name}) "
+        )
+    )
 
     # Add OOS line.
     new_oos_date = series_list[0].index.asof(pandas.to_datetime(oos_date))

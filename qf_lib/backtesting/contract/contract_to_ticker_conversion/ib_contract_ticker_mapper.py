@@ -60,7 +60,7 @@ class IBContractTickerMapper(ContractTickerMapper):
 
         # Search for the contract in the ticker to contract dictionary, ignoring last_trade_date if necessary
         ticker = self._contract_to_ticker_dict.get(contract, None) or \
-            self._contract_to_ticker_dict.get(contract_without_last_trade_date, None)
+                self._contract_to_ticker_dict.get(contract_without_last_trade_date, None)
 
         # Get the specific ticker for the given last trade date
         if isinstance(ticker, FutureTicker):
@@ -71,7 +71,7 @@ class IBContractTickerMapper(ContractTickerMapper):
             chain_tickers = self._data_provider.get_futures_chain_tickers(
                 ticker, ExpirationDateField.LastTradeableDate)[ticker]
             chain_tickers = chain_tickers.index[chain_tickers == contract.last_trade_date]
-            ticker = chain_tickers[0] if not chain_tickers.empty else None
+            ticker = None if chain_tickers.empty else chain_tickers[0]
 
         if ticker is None:
             raise ValueError(f"Could not map Interactive Brokers contract {contract} onto a Ticker object.")

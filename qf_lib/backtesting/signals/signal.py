@@ -72,19 +72,26 @@ class Signal:
         if other is self:
             return True
 
-        if not isinstance(other, Signal):
-            return False
-
-        return (self.ticker, self.suggested_exposure, self.confidence, self.expected_move, self.fraction_at_risk,
-                self.alpha_model) == (other.ticker, other.suggested_exposure, other.confidence, other.expected_move,
-                                      other.fraction_at_risk, other.alpha_model)
+        return (
+            (
+                self.ticker,
+                self.suggested_exposure,
+                self.confidence,
+                self.expected_move,
+                self.fraction_at_risk,
+                self.alpha_model,
+            )
+            == (
+                other.ticker,
+                other.suggested_exposure,
+                other.confidence,
+                other.expected_move,
+                other.fraction_at_risk,
+                other.alpha_model,
+            )
+            if isinstance(other, Signal)
+            else False
+        )
 
     def __str__(self):
-        return "Signal \n" \
-               "\tTicker:             {} \n" \
-               "\tSuggested Exposure: {} \n" \
-               "\tConfidence:         {} \n" \
-               "\tExpected Move:      {} \n" \
-               "\tFraction at Risk:   {} \n" \
-               "\tAlpha Model:        {}".format(self.ticker, self.suggested_exposure, self.confidence,
-                                                 self.expected_move, self.fraction_at_risk, str(self.alpha_model))
+        return f"Signal \n\tTicker:             {self.ticker} \n\tSuggested Exposure: {self.suggested_exposure} \n\tConfidence:         {self.confidence} \n\tExpected Move:      {self.expected_move} \n\tFraction at Risk:   {self.fraction_at_risk} \n\tAlpha Model:        {str(self.alpha_model)}"

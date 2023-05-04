@@ -115,7 +115,7 @@ class EventManager:
         return event
 
     def _dispatch_event(self, event: Event):
-        str_template = 'Dispatching event: {}'.format(event)
+        str_template = f'Dispatching event: {event}'
         self.logger.debug(str_template)
 
         event_type = type(event)

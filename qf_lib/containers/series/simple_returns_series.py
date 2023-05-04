@@ -34,8 +34,9 @@ class SimpleReturnsSeries(ReturnsSeries):
     def to_log_returns(self) -> "LogReturnsSeries":
         from qf_lib.containers.series.log_returns_series import LogReturnsSeries
         log_returns = log(self + 1)
-        log_returns_tms = LogReturnsSeries(index=self.index.copy(), data=log_returns.values).__finalize__(self)
-        return log_returns_tms
+        return LogReturnsSeries(
+            index=self.index.copy(), data=log_returns.values
+        ).__finalize__(self)
 
     def to_simple_returns(self) -> "SimpleReturnsSeries":
         return self
@@ -44,10 +45,7 @@ class SimpleReturnsSeries(ReturnsSeries):
         return (self + 1.0).prod() - 1.0
 
     def total_cumulative_returns_keep_nans(self) -> float:
-        if self.isna().all():  # If all values in series are Nan
-            return nan
-        else:
-            return self.total_cumulative_return()
+        return nan if self.isna().all() else self.total_cumulative_return()
 
     def _to_prices_values(self, initial_price):
         prices_values = append([1], self.values + 1)

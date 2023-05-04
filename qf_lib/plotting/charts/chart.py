@@ -194,12 +194,12 @@ class Chart:
     def assert_is_qfseries(cls, data_container: Any):
         from qf_lib.containers.series.qf_series import QFSeries
         if not isinstance(data_container, QFSeries):
-            raise ValueError("Chart can only work with instances of QFSeries. "
-                             "{} is not accepted as the data container".format(str(type(data_container))))
+            raise ValueError(
+                f"Chart can only work with instances of QFSeries. {str(type(data_container))} is not accepted as the data container"
+            )
 
     @classmethod
-    def determine_end_x(cls, start: datetime.datetime, series_list: List[Union[QFSeries, DataElementDecorator]]) \
-            -> datetime.datetime:
+    def determine_end_x(cls, start: datetime.datetime, series_list: List[Union[QFSeries, DataElementDecorator]]) -> datetime.datetime:
         """
         Implements a heuristic for determining the x-axis end date based on a start date and series list.
 
@@ -208,7 +208,7 @@ class Chart:
         difference is greater than or equal to 10 years, the nearest date aligned to a 5 year boundary will be
         returned. Otherwise a datetime representing the nearest future January is returned.
         """
-        assert len(series_list) > 0
+        assert series_list
 
         # Determine the most recent date out of all the data points in the specified series.
         latest_end_date = datetime.datetime(1, 1, 1)
@@ -223,14 +223,13 @@ class Chart:
         years = (latest_end_date - start).days // 365
 
         the_year = latest_end_date.year
-        if years >= 11:
-            # Work out the nearest future year that is divisible by `the_range`.
-            the_range = 5 if years >= 20 else 2
-            for i in range(1, the_range + 1):
-                if (the_year + i) % the_range == 0:
-                    return datetime.datetime(the_year + i, 1, 1)
-        else:
+        if years < 11:
             return datetime.datetime(the_year + 1, 1, 1)
+        # Work out the nearest future year that is divisible by `the_range`.
+        the_range = 5 if years >= 20 else 2
+        for i in range(1, the_range + 1):
+            if (the_year + i) % the_range == 0:
+                return datetime.datetime(the_year + i, 1, 1)
 
     @classmethod
     def get_axes_colors(cls) -> List[str]:
@@ -254,7 +253,9 @@ class Chart:
             decorator to be added
         """
         key = decorator.key
-        assert key not in self._decorators, "The key '{}' is already used for another decorator.".format(key)
+        assert (
+            key not in self._decorators
+        ), f"The key '{key}' is already used for another decorator."
 
         self._decorators[key] = decorator
 
@@ -268,22 +269,18 @@ class Chart:
 
     def get_data_element_decorators(self):
         from qf_lib.plotting.decorators.data_element_decorator import DataElementDecorator
-        data_element_decorators = []
-
-        for decorator in self._decorators.values():
-            if isinstance(decorator, DataElementDecorator):
-                data_element_decorators.append(decorator)
-        return data_element_decorators
+        return [
+            decorator
+            for decorator in self._decorators.values()
+            if isinstance(decorator, DataElementDecorator)
+        ]
 
     def extract_series_data(self):
         """
         Extract data from data element decorators added to the chart.
         """
-        result = []
         series = self.get_data_element_decorators()
-        for i in range(0, len(series)):
-            result.append(series[i].data.to_json())
-        return result
+        return [series[i].data.to_json() for i in range(0, len(series))]
 
     def _setup_axes_if_necessary(self, figsize: Tuple[float, float] = None):
         if self._ax is None:
@@ -404,7 +401,9 @@ class Chart:
         if adjusted_key is None:
             adjusted_key = str(uuid.uuid4())
 
-        assert adjusted_key not in self._decorators, "Key '{}' is already used.".format(adjusted_key)
+        assert (
+            adjusted_key not in self._decorators
+        ), f"Key '{adjusted_key}' is already used."
         return adjusted_key
 
     def _get_data_min_value(self):

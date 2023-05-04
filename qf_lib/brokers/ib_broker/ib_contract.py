@@ -122,12 +122,10 @@ class IBContract(Contract):
 
         ib_contract.conId = int(ib_contract.conId)
         ib_contract.strike = float(ib_contract.strike)
-        ib_contract.includeExpired = bool(ib_contract.includeExpired == "True")
+        ib_contract.includeExpired = ib_contract.includeExpired == "True"
 
         combo_legs = combo_legs.split(";")
-        combo_legs = [c for c in combo_legs if len(c) > 0]
-
-        if len(combo_legs) > 0:
+        if combo_legs := [c for c in combo_legs if len(c) > 0]:
             if len(combo_legs[-1].split(",")) == 3:
                 delta_neutral_contract = combo_legs[-1].split(",")
                 combo_legs = combo_legs[:-1]
@@ -160,11 +158,17 @@ class IBContract(Contract):
         if self is other:
             return True
 
-        if not isinstance(other, IBContract):
-            return False
-
-        return (self.symbol, self.secType, self.multiplier, self.last_trade_date) == \
-               (other.symbol, other.secType, other.multiplier, other.last_trade_date)
+        return (
+            (self.symbol, self.secType, self.multiplier, self.last_trade_date)
+            == (
+                other.symbol,
+                other.secType,
+                other.multiplier,
+                other.last_trade_date,
+            )
+            if isinstance(other, IBContract)
+            else False
+        )
 
     def __hash__(self):
         return hash((self.symbol, self.secType, self.multiplier))

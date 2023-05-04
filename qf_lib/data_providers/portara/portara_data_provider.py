@@ -79,7 +79,9 @@ class PortaraDataProvider(PresetDataProvider):
         self.logger = qf_logger.getChild(self.__class__.__name__)
 
         if frequency not in [Frequency.DAILY, Frequency.MIN_1]:
-            raise NotImplementedError("{} supports only DAILY and MIN_1 bars loading".format(self.__class__.__name__))
+            raise NotImplementedError(
+                f"{self.__class__.__name__} supports only DAILY and MIN_1 bars loading"
+            )
 
         fields, _ = convert_to_list(fields, PriceField)
 
@@ -171,8 +173,10 @@ class PortaraDataProvider(PresetDataProvider):
         tickers_strings_to_tickers = {
             ticker.as_string(): ticker for ticker in tickers if not isinstance(ticker, FutureTicker)
         }
-        tickers_paths = [list(Path(path).glob('**/{}.csv'.format(ticker_str)))
-                         for ticker_str in tickers_strings_to_tickers.keys()]
+        tickers_paths = [
+            list(Path(path).glob(f'**/{ticker_str}.csv'))
+            for ticker_str in tickers_strings_to_tickers
+        ]
         joined_tickers_paths = [item for sublist in tickers_paths for item in sublist]
 
         tickers_prices_dict = {}
@@ -197,9 +201,10 @@ class PortaraDataProvider(PresetDataProvider):
 
             df = df.rename(columns=field_to_price_field_dict)
             df = df.loc[start_date:end_date, df.columns.isin(fields)]
-            fields_diff = set(fields).difference(df.columns)
-            if fields_diff:
-                self.logger.info("Not all fields are available for {}. Difference: {}".format(ticker, fields_diff))
+            if fields_diff := set(fields).difference(df.columns):
+                self.logger.info(
+                    f"Not all fields are available for {ticker}. Difference: {fields_diff}"
+                )
 
             tickers_prices_dict[ticker] = QFDataFrame(df)
 

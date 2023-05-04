@@ -134,10 +134,7 @@ class Frequency(Enum):
 
     @classmethod
     def list_members(cls):
-        result = []
-        for key, value in cls.__members__.items():
-            result.append(str(value))
-        return result
+        return [str(value) for key, value in cls.__members__.items()]
 
     @classmethod
     def from_pandas_freq(cls, freq):
@@ -181,7 +178,7 @@ class Frequency(Enum):
         try:
             return frequency_to_pandas_freq[self]
         except KeyError:
-            return "{}T".format(self)
+            return f"{self}T"
 
     @classmethod
     def get_lowest_freq(cls, freqs: Dict[str, "Frequency"]) -> str:
@@ -193,7 +190,7 @@ class Frequency(Enum):
 
         if result == Frequency.IRREGULAR:
             # Attempt to infer the frequency ourselves.
-            diff = index.values[1:] - index.values[0:-1]
+            diff = index.values[1:] - index.values[:-1]
             most_popular = mode(diff).astype(
                 'timedelta64[D]') / np.timedelta64(1, 'D')
             if most_popular < 1:

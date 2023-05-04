@@ -36,8 +36,7 @@ class BacktestBroker(Broker):
         return list(self.portfolio.open_positions_dict.values())
 
     def place_orders(self, orders: Sequence[Order]) -> Sequence[int]:
-        id_list = self.execution_handler.assign_order_ids(orders)
-        return id_list
+        return self.execution_handler.assign_order_ids(orders)
 
     def cancel_order(self, order_id: int):
         self.execution_handler.cancel_order(order_id)

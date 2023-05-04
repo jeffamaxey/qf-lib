@@ -55,7 +55,7 @@ class ExcelImporter:
         container
             object containing the imported value
         """
-        self.logger.info("Started importing data from {}".format(file_path))
+        self.logger.info(f"Started importing data from {file_path}")
         work_book = self._get_work_book(file_path)
         work_sheet = self._get_work_sheet(work_book, sheet_name)
         result = work_sheet[cell_address]
@@ -64,8 +64,7 @@ class ExcelImporter:
 
     def import_container(
             self, file_path: str, starting_cell: str, ending_cell: str, container_type: type = None,
-            sheet_name: str = None, include_index: bool = True, include_column_names: bool = False) \
-            -> Union[QFSeries, QFDataFrame]:
+            sheet_name: str = None, include_index: bool = True, include_column_names: bool = False) -> Union[QFSeries, QFDataFrame]:
         """
         Imports a container of given type (e.g. Series/DataFrame) from the Excel file of a given name.
 
@@ -95,7 +94,7 @@ class ExcelImporter:
         container
             object containing the imported data
         """
-        self.logger.info("Started importing data from {}".format(file_path))
+        self.logger.info(f"Started importing data from {file_path}")
         start_time = datetime.datetime.now()
 
         work_book = self._get_work_book(file_path)
@@ -116,7 +115,9 @@ class ExcelImporter:
 
         end_time = datetime.datetime.now()
         execution_time = end_time - start_time
-        self.logger.info("Ended importing data from {} after {}".format(file_path, execution_time))
+        self.logger.info(
+            f"Ended importing data from {file_path} after {execution_time}"
+        )
 
         work_book.close()
         return container.squeeze()
@@ -125,16 +126,10 @@ class ExcelImporter:
         assert exists(file_path)
         with open(file_path, "rb") as f:
             in_memory_file = io.BytesIO(f.read())
-        work_book = load_workbook(in_memory_file, read_only=True, data_only=True)
-        return work_book
+        return load_workbook(in_memory_file, read_only=True, data_only=True)
 
     def _get_work_sheet(self, work_book, sheet_name):
-        if sheet_name is None:
-            work_sheet = work_book.active
-        else:
-            work_sheet = work_book[sheet_name]
-
-        return work_sheet
+        return work_book.active if sheet_name is None else work_book[sheet_name]
 
     def _infer_container_type(self, nr_of_non_index_columns):
         if nr_of_non_index_columns <= 0:
@@ -150,12 +145,11 @@ class ExcelImporter:
         return container_type
 
     def _is_correct_containers_type(self, container_type, nr_of_non_index_columns):
-        if nr_of_non_index_columns > 1:
-            correct_container_type = issubclass(container_type, QFDataFrame)
-        else:
-            correct_container_type = issubclass(container_type, QFSeries)
-
-        return correct_container_type
+        return (
+            issubclass(container_type, QFDataFrame)
+            if nr_of_non_index_columns > 1
+            else issubclass(container_type, QFSeries)
+        )
 
     def _load_container(self, work_sheet, container_type, bounding_box, include_index, include_column_names):
         container = None
@@ -219,22 +213,21 @@ class ExcelImporter:
     def _load_column(self, work_sheet, starting_row, ending_row, column_nr):
         values = []
 
-        row_nr = 1
-        for row in work_sheet.rows:
+        for row_nr, row in enumerate(work_sheet.rows, start=1):
             if starting_row <= row_nr <= ending_row:
-                col_nr = 1
-                for cell in row:
-                    if col_nr == column_nr:
-                        values.append(cell.value)
-                    col_nr += 1
-
-            row_nr += 1
-
+                values.extend(
+                    cell.value
+                    for col_nr, cell in enumerate(row, start=1)
+                    if col_nr == column_nr
+                )
         return values
 
     def _load_row(self, work_sheet, row_index):
-        for i, row in enumerate(work_sheet.rows):
-            if i == row_index - 1:
-                return [cell.value for cell in row]
-
-        return None
+        return next(
+            (
+                [cell.value for cell in row]
+                for i, row in enumerate(work_sheet.rows)
+                if i == row_index - 1
+            ),
+            None,
+        )

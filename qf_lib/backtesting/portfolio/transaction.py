@@ -61,21 +61,22 @@ class Transaction:
                 "Price", "Commission", "Net_amount", "Trade_ID", "Account", "Strategy", "Broker", "Currency"]
 
     def get_row(self):
-        row = [self.transaction_fill_time,
-               self.ticker.name,
-               self.ticker.ticker,
-               self.ticker.security_type.value,
-               self.ticker.point_value,
-               self.quantity,
-               self.price,
-               self.commission,
-               self.net_amount,
-               self.trade_id,
-               self.account,
-               self.strategy,
-               self.broker,
-               self.currency]
-        return row
+        return [
+            self.transaction_fill_time,
+            self.ticker.name,
+            self.ticker.ticker,
+            self.ticker.security_type.value,
+            self.ticker.point_value,
+            self.quantity,
+            self.price,
+            self.commission,
+            self.net_amount,
+            self.trade_id,
+            self.account,
+            self.strategy,
+            self.broker,
+            self.currency,
+        ]
 
     def __str__(self):
         return f"{self.__class__.__name__} ({date_to_str(self.transaction_fill_time)}) -> " \
@@ -94,8 +95,21 @@ class Transaction:
         if self is other:
             return True
 
-        if not isinstance(other, Transaction):
-            return False
-
-        return (self.transaction_fill_time, self.ticker, self.quantity, self.price, self.commission) == \
-               (other.transaction_fill_time, other.ticker, other.quantity, other.price, other.commission)
+        return (
+            (
+                self.transaction_fill_time,
+                self.ticker,
+                self.quantity,
+                self.price,
+                self.commission,
+            )
+            == (
+                other.transaction_fill_time,
+                other.ticker,
+                other.quantity,
+                other.price,
+                other.commission,
+            )
+            if isinstance(other, Transaction)
+            else False
+        )

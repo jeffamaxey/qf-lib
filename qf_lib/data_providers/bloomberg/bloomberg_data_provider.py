@@ -97,7 +97,9 @@ class BloombergDataProvider(AbstractPriceDataProvider, TickersUniverseProvider):
             return
 
         if not self.session.start():
-            self.logger.error("Failed to start session with host: " + str(self.host) + " on port: " + str(self.port))
+            self.logger.error(
+                f"Failed to start session with host: {str(self.host)} on port: {str(self.port)}"
+            )
             return
 
         if not self.session.openService(REF_DATA_SERVICE_URI):
@@ -201,10 +203,11 @@ class BloombergDataProvider(AbstractPriceDataProvider, TickersUniverseProvider):
         fields_indices = 0 if got_single_field else slice(None)
         squeezed_result = data_frame.iloc[tickers_indices, fields_indices]
 
-        casted_result = cast_dataframe_to_proper_type(squeezed_result) if tickers_indices != 0 or fields_indices != 0 \
+        return (
+            cast_dataframe_to_proper_type(squeezed_result)
+            if tickers_indices != 0 or fields_indices != 0
             else squeezed_result
-
-        return casted_result
+        )
 
     def get_history(self, tickers: Union[BloombergTicker, Sequence[BloombergTicker]], fields: Union[str, Sequence[str]],
                     start_date: datetime, end_date: datetime = None, frequency: Frequency = Frequency.DAILY,
@@ -274,30 +277,33 @@ class BloombergDataProvider(AbstractPriceDataProvider, TickersUniverseProvider):
         return {BloombergTicker, BloombergFutureTicker}
 
     def expiration_date_field_str_map(self, ticker: BloombergTicker = None) -> Dict[ExpirationDateField, str]:
-        expiration_date_field_dict = {
+        return {
             ExpirationDateField.FirstNotice: "FUT_NOTICE_FIRST",
-            ExpirationDateField.LastTradeableDate: "LAST_TRADEABLE_DT"
+            ExpirationDateField.LastTradeableDate: "LAST_TRADEABLE_DT",
         }
-        return expiration_date_field_dict
 
     def price_field_to_str_map(self, ticker: BloombergTicker = None) -> Dict[PriceField, str]:
-        price_field_dict = {
+        return {
             PriceField.Open: 'PX_OPEN',
             PriceField.High: 'PX_HIGH',
             PriceField.Low: 'PX_LOW',
             PriceField.Close: 'PX_LAST',
-            PriceField.Volume: 'PX_VOLUME'
+            PriceField.Volume: 'PX_VOLUME',
         }
-        return price_field_dict
 
     def get_tickers_universe(self, universe_ticker: BloombergTicker, date: datetime = None) -> List[BloombergTicker]:
-        if date and date.date() != datetime.today().date():
+        if date and date.date() != datetime.now().date():
             raise ValueError("BloombergDataProvider does not provide historical tickers_universe data")
         field = 'INDX_MEMBERS'
         ticker_data = self.get_tabular_data(universe_ticker, field)
-        tickers = [BloombergTicker(fields['Member Ticker and Exchange Code'] + " Equity", SecurityType.STOCK, 1)
-                   for fields in ticker_data]
-        return tickers
+        return [
+            BloombergTicker(
+                fields['Member Ticker and Exchange Code'] + " Equity",
+                SecurityType.STOCK,
+                1,
+            )
+            for fields in ticker_data
+        ]
 
     def get_unique_tickers(self, universe_ticker: Ticker) -> List[Ticker]:
         raise ValueError("BloombergDataProvider does not provide historical tickers_universe data")
@@ -326,7 +332,9 @@ class BloombergDataProvider(AbstractPriceDataProvider, TickersUniverseProvider):
             tabular data for the given ticker and field
         """
         if field is None:
-            raise ValueError("Field being None is not supported by {}".format(self.__class__.__name__))
+            raise ValueError(
+                f"Field being None is not supported by {self.__class__.__name__}"
+            )
 
         self._connect_if_needed()
         self._assert_is_connected()
@@ -340,9 +348,9 @@ class BloombergDataProvider(AbstractPriceDataProvider, TickersUniverseProvider):
         fields, got_single_field = convert_to_list(field, (PriceField, str))
 
         tickers_str = [t.as_string() for t in tickers]
-        result = self._tabular_data_provider.get(tickers_str, fields, override_names, override_values)
-
-        return result
+        return self._tabular_data_provider.get(
+            tickers_str, fields, override_names, override_values
+        )
 
     def _connect_if_needed(self):
         if not self.connected:

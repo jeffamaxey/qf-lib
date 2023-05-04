@@ -38,5 +38,4 @@ def calmar_ratio(qf_series: QFSeries, frequency: Frequency) -> float:
 
     annualised_growth_rate = cagr(qf_series, frequency)
     max_dd = max_drawdown(qf_series)
-    ratio = annualised_growth_rate / max_dd
-    return ratio
+    return annualised_growth_rate / max_dd

@@ -135,12 +135,14 @@ class ScenariosGenerator:
 
         # Initialise a random number generator
         rng = np.random.default_rng(seed)
-        if not include_zero:
-            elements = rng.choice(range(1, sum_of_values), number_of_elements - 1, replace=False).tolist()
-        else:
-            elements = rng.choice(range(0, sum_of_values + 1), number_of_elements - 1, replace=True).tolist()
-
+        elements = (
+            rng.choice(
+                range(0, sum_of_values + 1), number_of_elements - 1, replace=True
+            ).tolist()
+            if include_zero
+            else rng.choice(
+                range(1, sum_of_values), number_of_elements - 1, replace=False
+            ).tolist()
+        )
         elements = sorted(elements + [0, sum_of_values])
-        elements = [t - s for s, t in zip(elements, elements[1:])]
-
-        return elements
+        return [t - s for s, t in zip(elements, elements[1:])]

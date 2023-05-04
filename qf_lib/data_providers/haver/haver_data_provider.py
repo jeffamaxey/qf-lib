@@ -86,13 +86,12 @@ class HaverDataProvider(AbstractPriceDataProvider):
         try:
             if isinstance(tickers, HaverTicker):
                 return self._get_single(tickers, start_date, end_date)
-            else:
-                result = QFDataFrame()
-                # we should go one by one as making single large query will keep just common dates
-                for ticker in tickers:
-                    series = self._get_single(ticker, start_date, end_date)
-                    result[ticker] = series
-                return result
+            result = QFDataFrame()
+            # we should go one by one as making single large query will keep just common dates
+            for ticker in tickers:
+                series = self._get_single(ticker, start_date, end_date)
+                result[ticker] = series
+            return result
         finally:
             HaverDataProvider.get_lock.release()
 
@@ -103,8 +102,7 @@ class HaverDataProvider(AbstractPriceDataProvider):
         """
         Haver stores only end of day figures. Use PriceField.Close to obtain them
         """
-        price_field_dict = {PriceField.Close: None}  # Field representation is none as Field is unused
-        return price_field_dict
+        return {PriceField.Close: None}
 
     @staticmethod
     def _get_single(haver_ticker, start_date: datetime, end_date) -> QFSeries:

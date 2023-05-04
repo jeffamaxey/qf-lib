@@ -47,11 +47,7 @@ class ReturnsHeatmapChart(Chart):
         ret_table.rename(columns={1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
                                   7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}, inplace=True)
 
-        # Format Y axis to make sure we have a tick for each year or 2 years if there is more that 10 years
-        year_step = 1
-        if len(ret_table.index) > 10:
-            year_step = 2
-
+        year_step = 2 if len(ret_table.index) > 10 else 1
         sns.heatmap(
             ret_table,
             annot=True,

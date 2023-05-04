@@ -59,7 +59,7 @@ class TestReturnsUtils(TestCase):
 
     def test_compound_annual_growth_rate_monthly(self):
         actual_return = cagr(self.test_dd_prices_tms)
-        expected_return = pow(1.5, 12.0 / 12.0) - 1
+        expected_return = pow(1.5, 1.0) - 1
         self.assertAlmostEqual(expected_return, actual_return, delta=0.001)
 
     def test_annualise_total_return(self):
@@ -184,8 +184,8 @@ class TestReturnsUtils(TestCase):
 
     def test_beta_and_alpha(self):
         dates = date_range(start='2015-01-01', periods=10, freq='d')
-        series_values = [i for i in range(1, 21, 2)]
-        benchmark_values = [i for i in range(0, 10)]
+        series_values = list(range(1, 21, 2))
+        benchmark_values = list(range(0, 10))
         series_tms = SimpleReturnsSeries(data=series_values, index=dates).to_prices()
         benchmark_tms = SimpleReturnsSeries(data=benchmark_values, index=dates)
         actual_beta, actual_alpha = beta_and_alpha(series_tms, benchmark_tms)
